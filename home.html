@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f5f2">
+  <title>จ่ายจอย — จัดการค่าใช้จ่าย</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20231f;
+      --muted: #858980;
+      --paper: #f5f5f2;
+      --card: #fff;
+      --line: #e9eae5;
+      --green: #c9f36a;
+      --green-dark: #597c18;
+      --pink: #f7d8d1;
+      --blue: #dce8f8;
+      --yellow: #f5edbd;
+      --shadow: 0 12px 35px rgba(30, 34, 24, .06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    .app { width: min(100% - 36px, 1040px); margin: 0 auto; padding: 28px 0 56px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 34px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 850; letter-spacing: -.7px; }
+    .brand-mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 12px; background: var(--green); font-size: 19px; }
+    .privacy-btn { border: 1px solid var(--line); background: white; padding: 9px 13px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .eyebrow { margin: 0 0 7px; color: var(--muted); font-size: 12px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(26px, 5vw, 36px); letter-spacing: -1.3px; line-height: 1.15; }
+    .month-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+    .year-switch { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; font-weight: 700; }
+    .year-switch button { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 10px; background: white; cursor: pointer; }
+    .months { display: flex; flex-direction: column; align-items: center; gap: 13px; max-height: 390px; overflow-y: auto; padding: 3px 8px 12px; margin: 0 auto 19px; scrollbar-width: thin; }
+    .month-btn { display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; justify-content: center; gap: 7px; width: min(100%, 520px); min-height: 105px; padding: 16px; border: 2px solid transparent; border-radius: 20px; color: var(--ink); cursor: pointer; transition: .18s ease; box-shadow: 0 8px 20px rgba(30, 34, 24, .04); }
+    .month-btn:nth-child(4n + 1) { background: #f7dedb; }
+    .month-btn:nth-child(4n + 2) { background: #dce8f8; }
+    .month-btn:nth-child(4n + 3) { background: #f5edbd; }
+    .month-btn:nth-child(4n) { background: #e8def5; }
+    .month-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(30, 34, 24, .08); }
+    .month-btn.active { border-color: #667d3c; box-shadow: 0 0 0 3px rgba(201,243,106,.45), 0 10px 24px rgba(30,34,24,.08); }
+    .month-thai { font-size: 16px; font-weight: 800; }
+    .month-english { color: #666b61; font-size: 11px; font-weight: 750; letter-spacing: .12em; }
+    .month-view[hidden], #monthPicker[hidden] { display: none; }
+    .month-view-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 19px; }
+    .month-view-head h2 { margin: 0; font-size: clamp(22px, 4vw, 30px); letter-spacing: -.8px; }
+    .back-btn { padding: 9px 13px; border: 1px solid var(--line); border-radius: 12px; background: white; font-size: 13px; font-weight: 750; cursor: pointer; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .dashboard-card { min-width: 0; padding: 18px; border-radius: 18px; box-shadow: var(--shadow); }
+    .dashboard-metric { grid-column: span 2; min-height: 112px; }
+    .dashboard-metric.income { background: #e4efcc; }
+    .dashboard-metric.spent { background: #dce8f8; }
+    .dashboard-metric.compare-income { background: #f7dedb; }
+    .dashboard-metric.compare-spent { background: #f5edbd; }
+    .dashboard-label { color: #555b50; font-size: 13px; font-weight: 750; }
+    .dashboard-value { display: block; margin-top: 14px; font-size: clamp(22px, 3.5vw, 31px); font-weight: 850; letter-spacing: -.8px; line-height: 1.1; overflow-wrap: anywhere; }
+    .dashboard-hint { display: block; margin-top: 7px; color: #72776d; font-size: 11px; }
+    .dashboard-edit { float: right; padding: 6px 9px; border: 0; border-radius: 9px; background: rgba(255,255,255,.7); font-size: 11px; font-weight: 750; cursor: pointer; }
+    .dashboard-category { grid-column: span 2; display: flex; align-items: stretch; gap: 9px; padding: 0; background: transparent; box-shadow: none; }
+    .category-main { display: flex; flex: 1; min-width: 0; flex-direction: column; justify-content: space-between; gap: 13px; padding: 17px; border-radius: 18px; background: white; box-shadow: var(--shadow); }
+    .category-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; }
+    .category-total { font-size: 23px; font-weight: 850; letter-spacing: -.5px; }
+    .category-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+    .category-actions button { padding: 8px 10px; border: 0; border-radius: 10px; background: #f1f2ed; font-size: 11px; font-weight: 750; cursor: pointer; }
+    .category-actions button:hover { background: #e7e9e1; }
+    .loan-tracker { overflow: hidden; border: 1px solid #e7e9e2; border-radius: 14px; background: #fbfbf8; }
+    .loan-tracker-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 12px; border: 0; background: #f1f2ed; text-align: left; cursor: pointer; }
+    .loan-tracker-heading { min-width: 0; }
+    .loan-tracker-title { display: block; font-size: 12px; font-weight: 800; }
+    .loan-tracker-hint { display: block; margin-top: 3px; color: #777d72; font-size: 10px; }
+    .loan-tracker-total { flex: 0 0 auto; color: #344b3b; font-size: 14px; font-weight: 850; }
+    .loan-tracker-chevron { color: #72776d; font-size: 16px; transition: transform .18s ease; }
+    .loan-tracker-toggle[aria-expanded="true"] .loan-tracker-chevron { transform: rotate(180deg); }
+    .loan-tracker-content[hidden] { display: none; }
+    .loan-tracker-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; border-top: 1px solid #eceee8; }
+    .loan-tracker-name { display: flex; min-width: 0; flex: 1; align-items: center; gap: 9px; font-size: 12px; font-weight: 750; }
+    .loan-tracker-name-text { min-width: 0; overflow-wrap: anywhere; }
+    .loan-tracker-badge { display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center; border-radius: 10px; background: #e8eee1; color: #405743; font-size: 9px; font-weight: 850; }
+    .loan-lender-edit, .loan-lender-add, .loan-lender-save, .loan-lender-cancel { padding: 6px 8px; border: 0; border-radius: 8px; background: #e8eee1; color: #405743; font-size: 10px; font-weight: 750; cursor: pointer; }
+    .loan-lender-manager { padding: 10px; border-top: 1px solid #eceee8; }
+    .loan-lender-add { background: #e8eee1; }
+    .loan-lender-editor { display: grid; gap: 8px; margin-top: 10px; }
+    .loan-lender-editor[hidden] { display: none; }
+    .loan-lender-editor-fields { display: grid; grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
+    .loan-lender-editor input { width: 100%; min-width: 0; min-height: 36px; border: 1px solid #e1e4dc; border-radius: 9px; padding: 0 9px; background: white; font-size: 11px; }
+    .loan-lender-editor-actions { display: flex; gap: 7px; }
+    .loan-lender-save { background: #344b3b; color: white; }
+    .loan-lender-cancel { background: #f1f2ed; color: #555b50; }
+    .loan-lender-error { min-height: 14px; margin: 0; color: #bc4949; font-size: 10px; }
+    .loan-tracker-input-wrap { position: relative; width: 126px; flex: 0 0 auto; }
+    .loan-tracker-input { width: 100%; min-height: 36px; border: 1px solid #e1e4dc; border-radius: 10px; padding: 0 29px 0 9px; background: white; text-align: right; font-size: 12px; font-weight: 750; }
+    .loan-tracker-currency { position: absolute; top: 50%; right: 10px; color: #8b9086; font-size: 10px; transform: translateY(-50%); pointer-events: none; }
+    .month-view .loan-tracker { border-color: #d7d0bc; background: #f9f5e9; }
+    .month-view .loan-tracker-toggle { background: #eee7d6; }
+    .month-view .loan-tracker-row { border-color: #e6decb; }
+    .month-view .loan-tracker-input { border-color: #d9d0ba; }
+    .dashboard-balance { grid-column: span 2; min-height: 130px; background: #e8def5; }
+    .dashboard-balance .dashboard-value { font-size: clamp(28px, 4vw, 37px); }
+    .month-view {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(17px, 4vw, 30px);
+      border: 1px solid rgba(211, 190, 143, .34);
+      border-radius: 28px;
+      background:
+        radial-gradient(ellipse at 92% 3%, rgba(181, 151, 92, .16), transparent 34%),
+        linear-gradient(145deg, #182a25, #20362f 60%, #172722);
+      color: #f7f2e7;
+      box-shadow: 0 24px 60px rgba(21, 38, 32, .2);
+    }
+    .month-view-head { position: relative; z-index: 1; }
+    .month-view-head h2 {
+      color: #f4eddd;
+      font-family: Georgia, "Leelawadee UI", serif;
+      font-weight: 600;
+      letter-spacing: -.3px;
+    }
+    .month-view .back-btn {
+      border-color: rgba(215, 197, 157, .38);
+      background: rgba(255,255,255,.06);
+      color: #e9ddbd;
+    }
+    .month-view .back-btn:hover { background: rgba(255,255,255,.12); }
+    .month-view .dashboard-grid { position: relative; z-index: 1; }
+    .month-view .dashboard-card { box-shadow: 0 10px 24px rgba(4, 17, 12, .14); }
+    .month-view .dashboard-metric {
+      border: 1px solid rgba(215, 197, 157, .18);
+      background: linear-gradient(145deg, #2d433b, #263a33);
+    }
+    .month-view .dashboard-metric.income { background: linear-gradient(145deg, #34483c, #293d34); }
+    .month-view .dashboard-metric.spent { background: linear-gradient(145deg, #30413e, #273833); }
+    .month-view .dashboard-metric.compare-income,
+    .month-view .dashboard-metric.compare-spent { background: rgba(255,255,255,.055); }
+    .month-view .dashboard-label { color: #d7c69c; letter-spacing: .02em; }
+    .month-view .dashboard-value { color: #fbf7ee; }
+    .month-view .dashboard-hint { color: #b6b9ad; }
+    .month-view .dashboard-edit {
+      border: 1px solid rgba(215, 197, 157, .35);
+      background: rgba(215, 197, 157, .12);
+      color: #f0dfb8;
+    }
+    .month-view .dashboard-edit:hover { background: rgba(215, 197, 157, .22); }
+    .month-view .category-main {
+      border: 1px solid rgba(196, 173, 125, .32);
+      background: linear-gradient(145deg, #f8f3e8, #ece5d6);
+      box-shadow: 0 10px 23px rgba(4, 17, 12, .13);
+    }
+    .month-view .category-title { color: #30453b; }
+    .month-view .category-total { color: #202f29; }
+    .month-view .category-actions button {
+      background: #e4dcc9;
+      color: #40564a;
+    }
+    .month-view .category-actions button:hover { background: #d9cfb8; }
+    .month-view .dashboard-balance {
+      border: 1px solid rgba(246, 226, 182, .54);
+      background: linear-gradient(135deg, #d9c491, #b99f68);
+    }
+    .month-view .dashboard-balance .dashboard-label,
+    .month-view .dashboard-balance .dashboard-value { color: #26372e; }
+    .month-view .dashboard-balance .dashboard-hint { color: #4d594a; }
+    .month-view .section-head h2 { color: #f4eddd; }
+    .month-view .add-btn {
+      background: #d2bd8c;
+      color: #26372e;
+    }
+    .month-view .add-btn:hover { background: #e1d0a6; }
+    .month-view .expense-row {
+      border-color: rgba(211, 190, 143, .3);
+      background: #f8f4e9;
+      box-shadow: 0 8px 20px rgba(4, 17, 12, .12);
+    }
+    .month-view .expense-name { color: #293a32; }
+    .month-view .expense-meta { color: #74776d; }
+    .month-view .expense-amount { color: #293a32; }
+    .month-view .icon-btn { color: #687365; }
+    .month-view .icon-btn:hover { background: #e9e2d2; color: #293a32; }
+    .month-view .receipt-item-btn { border-color: #d7c89f; background: #eee5ce; color: #4a5744; }
+    .month-view .receipt-item-btn:hover, .month-view .receipt-item-btn.has-receipt { background: #dce8d3; color: #3d5841; }
+    .month-view .empty {
+      border-color: rgba(221, 206, 171, .46);
+      background: rgba(248, 244, 233, .97);
+      color: #74776d;
+    }
+    .month-view .empty strong { color: #293a32; }
+    .month-view .empty p { color: #74776d; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 29px 0 14px; }
+    .section-head h2 { margin: 0; font-size: 18px; letter-spacing: -.4px; }
+    .add-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 13px; padding: 11px 15px; background: var(--ink); color: white; font-size: 13px; font-weight: 750; cursor: pointer; }
+    .add-btn:hover { background: #41463d; }
+    .expense-list { display: grid; gap: 10px; }
+    .expense-row { display: grid; grid-template-columns: 46px 1fr auto auto; align-items: center; gap: 13px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 17px; background: white; }
+    .expense-icon { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 14px; font-size: 21px; }
+    .tone-0 { background: var(--pink); } .tone-1 { background: var(--blue); } .tone-2 { background: var(--yellow); } .tone-3 { background: #e6ddf5; }
+    .expense-name { font-size: 14px; font-weight: 800; }
+    .expense-meta { margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .expense-amount { white-space: nowrap; font-size: 15px; font-weight: 800; }
+    .row-actions { display: flex; gap: 5px; }
+    .icon-btn { display: grid; width: 32px; height: 32px; place-items: center; border: 0; border-radius: 10px; background: transparent; color: #858980; cursor: pointer; }
+    .icon-btn:hover { background: #f1f2ed; color: var(--ink); }
+    .receipt-item-btn { align-self: center; padding: 7px 10px; border: 1px solid #e3dcc9; border-radius: 10px; background: #f1ecde; color: #536147; font-size: 11px; font-weight: 750; white-space: nowrap; cursor: pointer; }
+    .receipt-item-btn:hover, .receipt-item-btn.has-receipt { background: #e4ecd9; color: #435b3f; }
+    .empty { padding: 42px 18px; border: 1px dashed #d9dcd3; border-radius: 18px; text-align: center; color: var(--muted); background: rgba(255,255,255,.55); }
+    .empty-emoji { font-size: 29px; }
+    .empty strong { display: block; margin: 9px 0 5px; color: var(--ink); font-size: 15px; }
+    .empty p { margin: 0; font-size: 13px; }
+    .footnote { margin: 22px 0 0; color: #9a9e95; font-size: 11px; text-align: center; }
+    .overlay { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 18px; background: rgba(26, 29, 23, .42); backdrop-filter: blur(7px); }
+    .overlay[hidden] { display: none; }
+    .dialog { width: min(100%, 410px); padding: 25px; border-radius: 24px; background: white; box-shadow: 0 22px 70px rgba(0,0,0,.18); }
+    .dialog h2 { margin: 0; font-size: 21px; letter-spacing: -.5px; }
+    .dialog-intro { margin: 8px 0 20px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .form-field { display: grid; gap: 7px; margin: 14px 0; }
+    .form-field[hidden] { display: none; }
+    .form-field label { font-size: 12px; font-weight: 750; }
+    .form-field input, .form-field select { width: 100%; min-height: 45px; border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; outline: none; background: white; }
+    .form-field input:focus, .form-field select:focus { border-color: #9ac53c; box-shadow: 0 0 0 3px rgba(201,243,106,.3); }
+    .form-error { min-height: 18px; margin: 4px 0 0; color: #bc4949; font-size: 12px; }
+    .form-actions { display: flex; gap: 9px; margin-top: 18px; }
+    .form-actions button { flex: 1; min-height: 44px; border: 0; border-radius: 12px; font-weight: 750; cursor: pointer; }
+    .primary { background: var(--green); } .secondary { background: #f1f2ed; }
+    .file-input { display: none; }
+    .pin-dialog { text-align: center; }
+    .pin-dialog .dialog-intro { margin-bottom: 18px; }
+    .pin-dots { display: flex; justify-content: center; gap: 12px; margin: 21px 0 17px; }
+    .pin-dot { width: 13px; height: 13px; border: 1.5px solid #cfd2c9; border-radius: 50%; }
+    .pin-dot.filled { border-color: var(--ink); background: var(--ink); }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; max-width: 280px; margin: 0 auto; }
+    .key { height: 49px; border: 0; border-radius: 13px; background: #f3f4f0; font-size: 18px; font-weight: 750; cursor: pointer; }
+    .key:hover { background: #e9ebE4; }
+    .key.blank { visibility: hidden; }
+    .key.action { background: transparent; color: #70756c; font-size: 12px; }
+    .pin-error { min-height: 18px; margin: 0 0 8px; color: #bc4949; font-size: 12px; }
+    @media (max-width: 650px) {
+      .app { width: min(100% - 28px, 520px); padding-top: 20px; }
+      .topbar { margin-bottom: 27px; }
+      .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+      .dashboard-card { padding: 14px; border-radius: 16px; }
+      .month-view { padding: 16px 13px; border-radius: 22px; }
+      .dashboard-metric { grid-column: span 1; min-height: 105px; }
+      .dashboard-category, .dashboard-balance { grid-column: 1 / -1; }
+      .category-main { padding: 14px; }
+      .loan-tracker-input-wrap { width: 118px; }
+      .month-view-head { align-items: flex-start; flex-direction: column; }
+      .expense-row { grid-template-columns: 42px 1fr auto; gap: 10px; padding: 12px; }
+      .expense-icon { width: 40px; height: 40px; }
+      .row-actions { grid-column: 2 / -1; justify-self: end; margin-top: -3px; }
+      .expense-amount { grid-column: 3; grid-row: 1; }
+      .expense-main { grid-column: 2; grid-row: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">฿</span><span>จ่ายจอย</span></div>
+      <button class="privacy-btn" id="lockButton" type="button" aria-label="ล็อกแอป">🔒 ล็อก</button>
+    </header>
+
+    <section aria-label="ค่าใช้จ่ายรายเดือน">
+      <div id="monthPicker">
+        <div class="month-heading">
+          <div><p class="eyebrow">จัดการเงินแบบสบาย ๆ</p><h1>เลือกเดือนที่อยากดู</h1></div>
+          <div class="year-switch"><button id="prevYear" type="button" aria-label="ปีก่อน">‹</button><span id="yearLabel"></span><button id="nextYear" type="button" aria-label="ปีถัดไป">›</button></div>
+        </div>
+        <nav class="months" id="monthTabs" aria-label="เลือกเดือน"></nav>
+      </div>
+
+      <section class="month-view" id="monthView" aria-label="สรุปรายจ่ายประจำเดือน" hidden>
+        <div class="month-view-head">
+          <button class="back-btn" id="backToMonths" type="button">← เลือกเดือน</button>
+          <h2 id="monthViewTitle"></h2>
+        </div>
+        <div class="dashboard-grid" id="dashboardGrid" aria-live="polite"></div>
+        <div class="section-head">
+          <h2>รายการทั้งหมด <span id="listMonth"></span></h2>
+          <button class="add-btn" id="addButton" type="button"><span aria-hidden="true">＋</span> เพิ่มรายการ</button>
+        </div>
+        <div class="expense-list" id="expenseList"></div>
+      </section>
+      <p class="footnote">ข้อมูลของคุณบันทึกไว้ในอุปกรณ์นี้เท่านั้น ✿</p>
+    </section>
+  </main>
+
+  <div class="overlay" id="pinOverlay" role="dialog" aria-modal="true" aria-labelledby="pinTitle" hidden>
+    <div class="dialog pin-dialog">
+      <div class="brand-mark" style="margin:0 auto 15px">฿</div>
+      <h2 id="pinTitle">ตั้งรหัสเข้าแอป</h2>
+      <p class="dialog-intro" id="pinIntro">ตั้งรหัส 6 หลักที่จำได้ เพื่อช่วยล็อกหน้าจอนี้</p>
+      <div class="pin-dots" id="pinDots" aria-hidden="true"></div>
+      <p class="pin-error" id="pinError" role="status"></p>
+      <div class="keypad" id="keypad" aria-label="แป้นตัวเลข"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="expenseOverlay" role="dialog" aria-modal="true" aria-labelledby="expenseDialogTitle" hidden>
+    <form class="dialog" id="expenseForm">
+      <h2 id="expenseDialogTitle">เพิ่มรายการ</h2>
+      <p class="dialog-intro">ใส่รายละเอียดไว้ จะได้เห็นภาพค่าใช้จ่ายชัดขึ้น</p>
+      <div class="form-field"><label for="expenseName">ชื่อรายการ</label><input id="expenseName" name="name" maxlength="50" placeholder="เช่น ค่าอินเทอร์เน็ต" required></div>
+      <div class="form-field"><label for="expenseAmount">จำนวนเงิน (บาท)</label><input id="expenseAmount" name="amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" required></div>
+      <div class="form-field"><label for="expenseCategory">หมวดหมู่</label><select id="expenseCategory" name="category"><option>ค่าบ้าน กทม</option><option>ค่าบ้าน นครราชสีมา</option><option>ค่าเน็ต</option><option>ค่าเงินกู้</option></select></div>
+      <div class="form-field" id="loanLenderField" hidden><label for="loanLender">รายการย่อยค่าเงินกู้</label><select id="loanLender" name="lender"><option value="">เลือกผู้ให้กู้</option></select></div>
+      <div class="form-field"><label for="expenseDate">วันที่จ่าย</label><input id="expenseDate" name="date" type="date" required></div>
+      <p class="form-error" id="expenseError" role="status"></p>
+      <div class="form-actions"><button class="secondary" id="cancelExpense" type="button">ยกเลิก</button><button class="primary" type="submit">บันทึก</button></div>
+    </form>
+  </div>
+
+  <div class="overlay" id="incomeOverlay" role="dialog" aria-modal="true" aria-labelledby="incomeDialogTitle" hidden>
+    <form class="dialog" id="incomeForm">
+      <h2 id="incomeDialogTitle">ตั้งเงินเดือน</h2>
+      <p class="dialog-intro">บันทึกเงินเดือนของเดือนที่เลือก เพื่อดูยอดคงเหลือ</p>
+      <div class="form-field"><label for="incomeAmount">เงินเดือน (บาท)</label><input id="incomeAmount" name="amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" required></div>
+      <p class="form-error" id="incomeError" role="status"></p>
+      <div class="form-actions"><button class="secondary" id="cancelIncome" type="button">ยกเลิก</button><button class="primary" type="submit">บันทึก</button></div>
+    </form>
+  </div>
+
+  <input class="file-input" id="itemReceiptInput" type="file" accept="image/*,application/pdf" aria-label="เลือกสลิปของรายการนี้">
+
+  <script>
+    (function () {
+      "use strict";
+      var DATA_KEY = "jaayjoy-expenses-v1";
+      var PIN_KEY = "jaayjoy-pin-v1";
+      var INCOME_KEY = "jaayjoy-income-v1";
+      var ITEM_RECEIPT_KEY = "jaayjoy-item-receipts-v1";
+      var LOAN_TRACKER_KEY = "jaayjoy-loan-tracker-v1";
+      var LOAN_LENDERS_KEY = "jaayjoy-loan-lenders-v1";
+      var months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      var fullMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      var englishMonths = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+      var categoryIcons = { "ค่าบ้าน กทม": "🏠", "ค่าบ้าน นครราชสีมา": "🏠", "ค่าเน็ต": "📶", "ค่าเงินกู้": "💳" };
+      var categories = ["ค่าบ้าน กทม", "ค่าบ้าน นครราชสีมา", "ค่าเน็ต", "ค่าเงินกู้"];
+      var defaultLoanLenders = [
+        { id: "finnix", name: "Finnix", short: "FN", isDefault: true },
+        { id: "moneythunder", name: "เงินทันเด้อ", short: "ทด", isDefault: true },
+        { id: "kbank", name: "กสิกร", short: "KB", isDefault: true },
+        { id: "uob", name: "UOB", short: "UOB", isDefault: true },
+        { id: "aeon", name: "AEON", short: "AE", isDefault: true },
+        { id: "truemoney", name: "true money", short: "TM", isDefault: true }
+      ];
+      var loanLenders = loadLoanLenders();
+      var colors = ["tone-0", "tone-1", "tone-2", "tone-3"];
+      var now = new Date();
+      var selectedMonth = now.getMonth();
+      var selectedYear = now.getFullYear();
+      var expenses = loadExpenses();
+      var incomes = loadStoredObject(INCOME_KEY);
+      var itemReceipts = loadStoredObject(ITEM_RECEIPT_KEY);
+      var loanAmounts = loadStoredObject(LOAN_TRACKER_KEY);
+      var loanAmountsNeedSave = migrateLoanAmounts();
+      var expensesNeedSave = migrateExpenseLenders();
+      var loanTrackerExpanded = true;
+      if (loanAmountsNeedSave) saveLoanAmounts();
+      if (expensesNeedSave) saveExpenses(expenses);
+      var editId = null;
+      var activeReceiptId = "";
+      var pinStage = "unlock";
+      var pinEntry = "";
+      var firstPin = "";
+
+      function loadExpenses() {
+        try {
+          var parsed = JSON.parse(localStorage.getItem(DATA_KEY) || "{}");
+          return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+        } catch (error) {
+          console.error("Could not read saved expenses.", error);
+          return {};
+        }
+      }
+      function loadStoredObject(key) {
+        try {
+          var parsed = JSON.parse(localStorage.getItem(key) || "{}");
+          return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+        } catch (error) {
+          console.error("Could not read saved data for " + key + ".", error);
+          return {};
+        }
+      }
+      function loadLoanLenders() {
+        var saved = loadStoredObject(LOAN_LENDERS_KEY);
+        var savedItems = Array.isArray(saved.items) ? saved.items : [];
+        var lenders = defaultLoanLenders.map(function (lender) {
+          return { id: lender.id, name: lender.name, short: lender.short, isDefault: true };
+        });
+        savedItems.forEach(function (item) {
+          if (!item || typeof item.id !== "string" || typeof item.name !== "string" || typeof item.short !== "string") return;
+          var existing = lenders.find(function (lender) { return lender.id === item.id; });
+          if (existing) {
+            existing.name = item.name.trim() || existing.name;
+            existing.short = item.short.trim() || existing.short;
+          } else if (item.id.indexOf("custom_") === 0 && item.name.trim() && item.short.trim()) {
+            lenders.push({ id: item.id, name: item.name.trim(), short: item.short.trim(), isDefault: false });
+          }
+        });
+        return lenders;
+      }
+      function findLoanLenderById(id) {
+        return loanLenders.find(function (lender) { return lender.id === id; }) || null;
+      }
+      function findLoanLenderByName(name) {
+        var lender = loanLenders.find(function (entry) { return entry.name === name; });
+        if (lender) return lender;
+        var original = defaultLoanLenders.find(function (entry) { return entry.name === name; });
+        return original ? findLoanLenderById(original.id) : null;
+      }
+      function migrateLoanAmounts() {
+        var changed = false;
+        Object.keys(loanAmounts).forEach(function (key) {
+          var amounts = loanAmounts[key];
+          if (!amounts || typeof amounts !== "object" || Array.isArray(amounts)) return;
+          loanLenders.forEach(function (lender) {
+            var original = defaultLoanLenders.find(function (entry) { return entry.id === lender.id; });
+            var legacyNames = [lender.name, original ? original.name : ""];
+            legacyNames.forEach(function (name) {
+              if (!name || name === lender.id || !Object.prototype.hasOwnProperty.call(amounts, name)) return;
+              if (!Object.prototype.hasOwnProperty.call(amounts, lender.id)) amounts[lender.id] = amounts[name];
+              delete amounts[name];
+              changed = true;
+            });
+          });
+        });
+        return changed;
+      }
+      function migrateExpenseLenders() {
+        var changed = false;
+        Object.keys(expenses).forEach(function (key) {
+          if (!Array.isArray(expenses[key])) return;
+          expenses[key].forEach(function (item) {
+            if (!item || item.category !== "ค่าเงินกู้" || item.lenderId || !item.lender) return;
+            var lender = findLoanLenderByName(item.lender);
+            if (lender) {
+              item.lenderId = lender.id;
+              changed = true;
+            }
+          });
+        });
+        return changed;
+      }
+      function saveExpenses(updated) {
+        try {
+          localStorage.setItem(DATA_KEY, JSON.stringify(updated));
+          expenses = updated;
+          return true;
+        } catch (error) {
+          console.error("Could not save expenses.", error);
+          window.alert("บันทึกไม่สำเร็จ อาจเป็นเพราะพื้นที่จัดเก็บเต็ม");
+          return false;
+        }
+      }
+      function saveLoanAmounts() {
+        try {
+          localStorage.setItem(LOAN_TRACKER_KEY, JSON.stringify(loanAmounts));
+          return true;
+        } catch (error) {
+          console.error("Could not save monthly loan amounts.", error);
+          window.alert("บันทึกยอดค่าเงินกู้ไม่สำเร็จ อาจเป็นเพราะพื้นที่จัดเก็บเต็ม");
+          return false;
+        }
+      }
+      function saveLoanLenders() {
+        try {
+          localStorage.setItem(LOAN_LENDERS_KEY, JSON.stringify({
+            items: loanLenders.map(function (lender) {
+              return { id: lender.id, name: lender.name, short: lender.short };
+            })
+          }));
+          return true;
+        } catch (error) {
+          console.error("Could not save loan lender names.", error);
+          window.alert("บันทึกชื่อผู้ให้กู้ไม่สำเร็จ อาจเป็นเพราะพื้นที่จัดเก็บเต็ม");
+          return false;
+        }
+      }
+      function monthKey(year, month) { return year + "-" + String(month + 1).padStart(2, "0"); }
+      function currentItems() { return Array.isArray(expenses[monthKey(selectedYear, selectedMonth)]) ? expenses[monthKey(selectedYear, selectedMonth)] : []; }
+      function previousMonthKey() {
+        return selectedMonth === 0 ? monthKey(selectedYear - 1, 11) : monthKey(selectedYear, selectedMonth - 1);
+      }
+      function formatMoney(value) {
+        return new Intl.NumberFormat("th-TH", { maximumFractionDigits: 2, minimumFractionDigits: 0 }).format(value);
+      }
+      function makeCard(className, label, value, hint) {
+        var card = document.createElement("article");
+        card.className = className;
+        var title = document.createElement("div");
+        title.className = "dashboard-label";
+        title.textContent = label;
+        var amount = document.createElement("strong");
+        amount.className = "dashboard-value";
+        amount.textContent = value;
+        card.appendChild(title);
+        card.appendChild(amount);
+        if (hint) {
+          var detail = document.createElement("span");
+          detail.className = "dashboard-hint";
+          detail.textContent = hint;
+          card.appendChild(detail);
+        }
+        return card;
+      }
+      function comparisonText(current, previous, exists) {
+        if (!exists) return { value: "—", hint: "ยังไม่มีข้อมูลเดือนก่อน" };
+        var difference = current - previous;
+        var prefix = difference > 0 ? "+" : difference < 0 ? "−" : "";
+        return {
+          value: prefix + "฿" + formatMoney(Math.abs(difference)),
+          hint: difference > 0 ? "เพิ่มขึ้นจากเดือนก่อน" : difference < 0 ? "ลดลงจากเดือนก่อน" : "เท่าเดิมกับเดือนก่อน"
+        };
+      }
+      function getLoanAmountsForMonth(key) {
+        var saved = loanAmounts[key];
+        return saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
+      }
+      function sumLoanAmounts(amounts) {
+        return loanLenders.reduce(function (sum, lender) {
+          var amount = Number(amounts[lender.id]);
+          return sum + (Number.isFinite(amount) && amount > 0 ? amount : 0);
+        }, 0);
+      }
+      function renderLoanTracker(container, key) {
+        var amounts = getLoanAmountsForMonth(key);
+        var tracker = document.createElement("section");
+        tracker.className = "loan-tracker";
+        var toggle = document.createElement("button");
+        toggle.className = "loan-tracker-toggle";
+        toggle.type = "button";
+        toggle.setAttribute("aria-expanded", String(loanTrackerExpanded));
+        toggle.setAttribute("aria-controls", "loanTrackerContent");
+        var heading = document.createElement("span");
+        heading.className = "loan-tracker-heading";
+        var title = document.createElement("span");
+        title.className = "loan-tracker-title";
+        title.textContent = "ยอดชำระแยกตามผู้ให้กู้";
+        var hint = document.createElement("span");
+        hint.className = "loan-tracker-hint";
+        hint.textContent = "กรอกยอดรายเดือน แยกจากรายการรายจ่ายด้านล่าง";
+        heading.appendChild(title);
+        heading.appendChild(hint);
+        var total = document.createElement("strong");
+        total.className = "loan-tracker-total";
+        total.textContent = "฿" + formatMoney(sumLoanAmounts(amounts));
+        var chevron = document.createElement("span");
+        chevron.className = "loan-tracker-chevron";
+        chevron.setAttribute("aria-hidden", "true");
+        chevron.textContent = "⌄";
+        toggle.appendChild(heading);
+        toggle.appendChild(total);
+        toggle.appendChild(chevron);
+        var content = document.createElement("div");
+        content.className = "loan-tracker-content";
+        content.id = "loanTrackerContent";
+        content.hidden = !loanTrackerExpanded;
+        toggle.addEventListener("click", function () {
+          loanTrackerExpanded = !loanTrackerExpanded;
+          toggle.setAttribute("aria-expanded", String(loanTrackerExpanded));
+          content.hidden = !loanTrackerExpanded;
+        });
+
+        loanLenders.forEach(function (lender) {
+          var row = document.createElement("div");
+          row.className = "loan-tracker-row";
+          var name = document.createElement("span");
+          name.className = "loan-tracker-name";
+          var badge = document.createElement("span");
+          badge.className = "loan-tracker-badge";
+          badge.textContent = lender.short;
+          var lenderName = document.createElement("span");
+          lenderName.className = "loan-tracker-name-text";
+          lenderName.textContent = lender.name;
+          var editButton = document.createElement("button");
+          editButton.className = "loan-lender-edit";
+          editButton.type = "button";
+          editButton.textContent = "แก้ไข";
+          editButton.setAttribute("aria-label", "แก้ไขชื่อ " + lender.name);
+          name.appendChild(badge);
+          name.appendChild(lenderName);
+          name.appendChild(editButton);
+          var inputWrap = document.createElement("span");
+          inputWrap.className = "loan-tracker-input-wrap";
+          var input = document.createElement("input");
+          input.className = "loan-tracker-input";
+          input.type = "number";
+          input.id = "loanAmount-" + lender.id;
+          input.min = "0";
+          input.step = "0.01";
+          input.inputMode = "decimal";
+          input.placeholder = "0.00";
+          input.setAttribute("aria-label", "ยอดที่ต้องจ่าย " + lender.name);
+          input.value = amounts[lender.id] === undefined || amounts[lender.id] === null ? "" : amounts[lender.id];
+          var currency = document.createElement("span");
+          currency.className = "loan-tracker-currency";
+          currency.textContent = "฿";
+          input.addEventListener("input", function () {
+            var value = input.value;
+            if (value !== "" && (!Number.isFinite(Number(value)) || Number(value) < 0)) return;
+            var monthAmounts = loanAmounts[key];
+            if (!monthAmounts || typeof monthAmounts !== "object" || Array.isArray(monthAmounts)) {
+              monthAmounts = {};
+              loanAmounts[key] = monthAmounts;
+            }
+            if (value === "") delete monthAmounts[lender.id];
+            else monthAmounts[lender.id] = value;
+            total.textContent = "฿" + formatMoney(sumLoanAmounts(monthAmounts));
+            if (!Object.keys(monthAmounts).length) delete loanAmounts[key];
+            saveLoanAmounts();
+          });
+          editButton.addEventListener("click", function () {
+            editorTitle.textContent = "แก้ไขชื่อผู้ให้กู้";
+            nameInput.value = lender.name;
+            shortInput.value = lender.short;
+            editingLenderId = lender.id;
+            editorError.textContent = "";
+            editor.hidden = false;
+            nameInput.focus();
+          });
+          inputWrap.appendChild(input);
+          inputWrap.appendChild(currency);
+          row.appendChild(name);
+          row.appendChild(inputWrap);
+          content.appendChild(row);
+        });
+        var manager = document.createElement("div");
+        manager.className = "loan-lender-manager";
+        var addButton = document.createElement("button");
+        addButton.className = "loan-lender-add";
+        addButton.type = "button";
+        addButton.textContent = "＋ เพิ่มผู้ให้กู้";
+        var editor = document.createElement("div");
+        editor.className = "loan-lender-editor";
+        editor.hidden = true;
+        var editorTitle = document.createElement("strong");
+        editorTitle.className = "loan-tracker-title";
+        editorTitle.textContent = "เพิ่มผู้ให้กู้";
+        var editorFields = document.createElement("div");
+        editorFields.className = "loan-lender-editor-fields";
+        var nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.maxLength = 40;
+        nameInput.placeholder = "ชื่อผู้ให้กู้";
+        nameInput.setAttribute("aria-label", "ชื่อผู้ให้กู้");
+        var shortInput = document.createElement("input");
+        shortInput.type = "text";
+        shortInput.maxLength = 6;
+        shortInput.placeholder = "ชื่อย่อ";
+        shortInput.setAttribute("aria-label", "ชื่อย่อบนป้าย");
+        editorFields.appendChild(nameInput);
+        editorFields.appendChild(shortInput);
+        var editorError = document.createElement("p");
+        editorError.className = "loan-lender-error";
+        editorError.setAttribute("role", "status");
+        var editorActions = document.createElement("div");
+        editorActions.className = "loan-lender-editor-actions";
+        var saveButton = document.createElement("button");
+        saveButton.className = "loan-lender-save";
+        saveButton.type = "button";
+        saveButton.textContent = "บันทึก";
+        var cancelButton = document.createElement("button");
+        cancelButton.className = "loan-lender-cancel";
+        cancelButton.type = "button";
+        cancelButton.textContent = "ยกเลิก";
+        var editingLenderId = null;
+        addButton.addEventListener("click", function () {
+          editingLenderId = null;
+          editorTitle.textContent = "เพิ่มผู้ให้กู้";
+          nameInput.value = "";
+          shortInput.value = "";
+          editorError.textContent = "";
+          editor.hidden = false;
+          nameInput.focus();
+        });
+        cancelButton.addEventListener("click", function () {
+          editor.hidden = true;
+          editorError.textContent = "";
+        });
+        saveButton.addEventListener("click", function () {
+          var name = nameInput.value.trim();
+          var short = shortInput.value.trim();
+          if (!name || !short) {
+            editorError.textContent = "กรอกชื่อเต็มและชื่อย่อก่อนบันทึก";
+            return;
+          }
+          var duplicate = loanLenders.some(function (lender) {
+            return lender.id !== editingLenderId && lender.name.toLocaleLowerCase() === name.toLocaleLowerCase();
+          });
+          if (duplicate) {
+            editorError.textContent = "มีชื่อผู้ให้กู้นี้แล้ว";
+            return;
+          }
+          if (editingLenderId) {
+            var lender = findLoanLenderById(editingLenderId);
+            var oldName = lender.name;
+            var oldShort = lender.short;
+            lender.name = name;
+            lender.short = short;
+            if (!saveLoanLenders()) {
+              lender.name = oldName;
+              lender.short = oldShort;
+              return;
+            }
+          } else {
+            var newLender = {
+              id: "custom_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+              name: name,
+              short: short,
+              isDefault: false
+            };
+            loanLenders.push(newLender);
+            if (!saveLoanLenders()) {
+              loanLenders.pop();
+              return;
+            }
+          }
+          render();
+        });
+        editorActions.appendChild(saveButton);
+        editorActions.appendChild(cancelButton);
+        editor.appendChild(editorTitle);
+        editor.appendChild(editorFields);
+        editor.appendChild(editorError);
+        editor.appendChild(editorActions);
+        manager.appendChild(addButton);
+        manager.appendChild(editor);
+        content.appendChild(manager);
+        tracker.appendChild(toggle);
+        tracker.appendChild(content);
+        container.appendChild(tracker);
+      }
+      function renderDashboard(items, total) {
+        var key = monthKey(selectedYear, selectedMonth);
+        var previousKey = previousMonthKey();
+        var previousItems = Array.isArray(expenses[previousKey]) ? expenses[previousKey] : [];
+        var income = Number(incomes[key]) || 0;
+        var previousIncomeExists = Object.prototype.hasOwnProperty.call(incomes, previousKey);
+        var previousIncome = Number(incomes[previousKey]) || 0;
+        var incomeComparison = comparisonText(income, previousIncome, previousIncomeExists);
+        var expenseComparison = comparisonText(total, previousItems.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0), Object.prototype.hasOwnProperty.call(expenses, previousKey));
+        var grid = document.getElementById("dashboardGrid");
+        grid.textContent = "";
+        document.getElementById("monthViewTitle").textContent = "เดือน" + fullMonths[selectedMonth] + " " + selectedYear;
+        document.getElementById("listMonth").textContent = months[selectedMonth];
+
+        var incomeCard = makeCard("dashboard-card dashboard-metric income", "เงินเดือน", "฿" + formatMoney(income), "รายรับที่บันทึกไว้ของเดือนนี้");
+        var incomeButton = document.createElement("button");
+        incomeButton.className = "dashboard-edit";
+        incomeButton.type = "button";
+        incomeButton.textContent = "ตั้งค่า";
+        incomeButton.addEventListener("click", openIncome);
+        incomeCard.insertBefore(incomeButton, incomeCard.firstChild);
+        grid.appendChild(incomeCard);
+
+        var expenseCard = makeCard("dashboard-card dashboard-metric spent", "รายจ่าย", "฿" + formatMoney(total), items.length + " รายการในเดือนนี้");
+        grid.appendChild(expenseCard);
+        grid.appendChild(makeCard("dashboard-card dashboard-metric compare-income", "เงินเดือนเทียบเดือนก่อน", incomeComparison.value, incomeComparison.hint));
+        grid.appendChild(makeCard("dashboard-card dashboard-metric compare-spent", "รายจ่ายเทียบเดือนก่อน", expenseComparison.value, expenseComparison.hint));
+
+        categories.forEach(function (category) {
+          var categoryItems = items.filter(function (item) { return item.category === category; });
+          var categoryTotal = categoryItems.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0);
+          var categoryCard = document.createElement("article");
+          categoryCard.className = "dashboard-card dashboard-category";
+          var main = document.createElement("div");
+          main.className = "category-main";
+          var title = document.createElement("div");
+          title.className = "category-title";
+          title.textContent = (categoryIcons[category] || "✦") + " " + category;
+          var amount = document.createElement("strong");
+          amount.className = "category-total";
+          amount.textContent = "฿" + formatMoney(categoryTotal);
+          var actions = document.createElement("div");
+          actions.className = "category-actions";
+          var add = document.createElement("button");
+          add.type = "button";
+          add.textContent = "＋ เพิ่มรายการ";
+          add.addEventListener("click", function () { openExpense(null, category); });
+          actions.appendChild(add);
+          main.appendChild(title);
+          main.appendChild(amount);
+          main.appendChild(actions);
+          if (category === "ค่าเงินกู้") renderLoanTracker(main, key);
+
+          categoryCard.appendChild(main);
+          grid.appendChild(categoryCard);
+        });
+
+        var balanceCard = makeCard("dashboard-card dashboard-balance", "คงเหลือ", "฿" + formatMoney(income - total), "เงินเดือน − รายจ่าย");
+        grid.appendChild(balanceCard);
+      }
+      function renderMonths() {
+        document.getElementById("yearLabel").textContent = selectedYear;
+        var tabs = document.getElementById("monthTabs");
+        tabs.textContent = "";
+        var monthOrder = [];
+        for (var index = selectedMonth; index >= 0; index--) monthOrder.push(index);
+        for (var futureIndex = 11; futureIndex > selectedMonth; futureIndex--) monthOrder.push(futureIndex);
+        monthOrder.forEach(function (index) {
+          var button = document.createElement("button");
+          button.type = "button";
+          button.className = "month-btn" + (index === selectedMonth ? " active" : "");
+          var thaiName = document.createElement("span");
+          thaiName.className = "month-thai";
+          thaiName.textContent = "เดือน" + fullMonths[index] + " " + selectedYear;
+          var englishName = document.createElement("span");
+          englishName.className = "month-english";
+          englishName.textContent = englishMonths[index];
+          button.appendChild(thaiName);
+          button.appendChild(englishName);
+          button.setAttribute("aria-pressed", index === selectedMonth ? "true" : "false");
+          button.addEventListener("click", function () {
+            selectedMonth = index;
+            render();
+            document.getElementById("monthPicker").hidden = true;
+            document.getElementById("monthView").hidden = false;
+          });
+          tabs.appendChild(button);
+        });
+      }
+      function render() {
+        renderMonths();
+        var items = currentItems();
+        var total = items.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0);
+        renderDashboard(items, total);
+        var list = document.getElementById("expenseList");
+        list.textContent = "";
+        if (!items.length) {
+          var empty = document.createElement("div");
+          empty.className = "empty";
+          empty.innerHTML = '<div class="empty-emoji">🪴</div><strong>ยังไม่มีรายการของเดือนนี้</strong><p>กด “เพิ่มรายการ” แล้วเริ่มจัดระเบียบเงินกันเลย</p>';
+          list.appendChild(empty);
+          return;
+        }
+        items.slice().sort(function (a, b) { return b.date.localeCompare(a.date); }).forEach(function (item, index) {
+          var row = document.createElement("article");
+          row.className = "expense-row";
+          var icon = document.createElement("div");
+          icon.className = "expense-icon " + colors[index % colors.length];
+          icon.textContent = categoryIcons[item.category] || "✦";
+          var main = document.createElement("div");
+          main.className = "expense-main";
+          var name = document.createElement("div");
+          name.className = "expense-name";
+          name.textContent = item.name;
+          var meta = document.createElement("div");
+          meta.className = "expense-meta";
+          var itemLender = item.lenderId ? findLoanLenderById(item.lenderId) : null;
+          meta.textContent = [item.category || "อื่น ๆ", itemLender ? itemLender.name : item.lender, formatDate(item.date)].filter(Boolean).join(" · ");
+          main.appendChild(name); main.appendChild(meta);
+          var amount = document.createElement("div");
+          amount.className = "expense-amount";
+          amount.textContent = "฿" + formatMoney(Number(item.amount));
+          var actions = document.createElement("div");
+          actions.className = "row-actions";
+          var receipt = document.createElement("button");
+          receipt.type = "button";
+          receipt.className = "receipt-item-btn" + (itemReceipts[item.id] ? " has-receipt" : "");
+          receipt.textContent = itemReceipts[item.id] ? "🧾 ดูสลิป" : "＋ สลิป";
+          receipt.setAttribute("aria-label", itemReceipts[item.id] ? "ดูสลิปของ " + item.name : "แนบสลิปให้ " + item.name);
+          receipt.addEventListener("click", function () {
+            if (itemReceipts[item.id]) {
+              window.open(itemReceipts[item.id].dataUrl, "_blank", "noopener");
+            } else {
+              activeReceiptId = item.id;
+              document.getElementById("itemReceiptInput").click();
+            }
+          });
+          var edit = document.createElement("button");
+          edit.className = "icon-btn"; edit.type = "button"; edit.setAttribute("aria-label", "แก้ไข " + item.name); edit.textContent = "✎";
+          edit.addEventListener("click", function () { openExpense(item.id); });
+          var remove = document.createElement("button");
+          remove.className = "icon-btn"; remove.type = "button"; remove.setAttribute("aria-label", "ลบ " + item.name); remove.textContent = "×";
+          remove.addEventListener("click", function () { deleteExpense(item.id); });
+          actions.appendChild(receipt); actions.appendChild(edit); actions.appendChild(remove);
+          row.appendChild(icon); row.appendChild(main); row.appendChild(amount); row.appendChild(actions);
+          list.appendChild(row);
+        });
+      }
+      function formatDate(value) {
+        if (!value) return "";
+        var parts = value.split("-");
+        return parts.length === 3 ? Number(parts[2]) + " " + months[Number(parts[1]) - 1] + " " + (Number(parts[0]) + 543) : value;
+      }
+      function inputDateLocal(date) {
+        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+      }
+      function refreshLoanLenderOptions(selectedId) {
+        var select = document.getElementById("loanLender");
+        select.textContent = "";
+        var placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "เลือกผู้ให้กู้";
+        select.appendChild(placeholder);
+        loanLenders.forEach(function (lender) {
+          var option = document.createElement("option");
+          option.value = lender.id;
+          option.textContent = lender.name;
+          select.appendChild(option);
+        });
+        if (selectedId) select.value = selectedId;
+      }
+      function openExpense(id, category) {
+        editId = id || null;
+        var form = document.getElementById("expenseForm");
+        form.reset();
+        document.getElementById("expenseDialogTitle").textContent = editId ? "แก้ไขรายการ" : "เพิ่มรายการ";
+        document.getElementById("expenseError").textContent = "";
+        var item = editId ? currentItems().find(function (entry) { return entry.id === editId; }) : null;
+        var date = item ? item.date : inputDateLocal(new Date(selectedYear, selectedMonth, Math.min(now.getDate(), new Date(selectedYear, selectedMonth + 1, 0).getDate())));
+        form.elements.name.value = item ? item.name : "";
+        form.elements.amount.value = item ? item.amount : "";
+        form.elements.category.value = item ? item.category : (category || categories[0]);
+        var itemLender = item ? (item.lenderId ? findLoanLenderById(item.lenderId) : findLoanLenderByName(item.lender)) : null;
+        refreshLoanLenderOptions(itemLender ? itemLender.id : "");
+        form.elements.lender.value = itemLender ? itemLender.id : "";
+        updateLoanLenderField();
+        form.elements.date.value = date;
+        document.getElementById("expenseOverlay").hidden = false;
+        document.getElementById("expenseName").focus();
+      }
+      function updateLoanLenderField() {
+        var form = document.getElementById("expenseForm");
+        var isLoan = form.elements.category.value === "ค่าเงินกู้";
+        document.getElementById("loanLenderField").hidden = !isLoan;
+        form.elements.lender.required = isLoan;
+        if (!isLoan) form.elements.lender.value = "";
+      }
+      function closeExpense() { document.getElementById("expenseOverlay").hidden = true; }
+      function openIncome() {
+        var form = document.getElementById("incomeForm");
+        form.reset();
+        form.elements.amount.value = Object.prototype.hasOwnProperty.call(incomes, monthKey(selectedYear, selectedMonth)) ? incomes[monthKey(selectedYear, selectedMonth)] : "";
+        document.getElementById("incomeError").textContent = "";
+        document.getElementById("incomeOverlay").hidden = false;
+        document.getElementById("incomeAmount").focus();
+      }
+      function closeIncome() { document.getElementById("incomeOverlay").hidden = true; }
+      function saveItemReceipt(file, expenseId) {
+        if (!file || !expenseId) return;
+        if (file.size > 700 * 1024) {
+          window.alert("ไฟล์สลิปต้องมีขนาดไม่เกิน 700 KB");
+          return;
+        }
+        var reader = new FileReader();
+        reader.onerror = function () { window.alert("อ่านไฟล์สลิปไม่สำเร็จ ลองเลือกไฟล์อีกครั้ง"); };
+        reader.onload = function () {
+          var updated = Object.assign({}, itemReceipts);
+          updated[expenseId] = { name: file.name, type: file.type, dataUrl: reader.result };
+          try {
+            localStorage.setItem(ITEM_RECEIPT_KEY, JSON.stringify(updated));
+            itemReceipts = updated;
+            render();
+          } catch (error) {
+            console.error("Could not save item receipt.", error);
+            window.alert("บันทึกสลิปไม่สำเร็จ พื้นที่จัดเก็บในอุปกรณ์อาจเต็ม");
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+      function deleteExpense(id) {
+        if (!window.confirm("ลบรายการนี้ใช่ไหม?")) return;
+        var key = monthKey(selectedYear, selectedMonth);
+        var updated = Object.assign({}, expenses);
+        updated[key] = currentItems().filter(function (item) { return item.id !== id; });
+        if (saveExpenses(updated)) {
+          if (itemReceipts[id]) {
+            var updatedReceipts = Object.assign({}, itemReceipts);
+            delete updatedReceipts[id];
+            try {
+              localStorage.setItem(ITEM_RECEIPT_KEY, JSON.stringify(updatedReceipts));
+              itemReceipts = updatedReceipts;
+            } catch (error) {
+              console.error("Could not remove receipt for deleted expense.", error);
+              window.alert("ลบรายการแล้ว แต่ลบไฟล์สลิปเดิมไม่สำเร็จ");
+            }
+          }
+          render();
+        }
+      }
+      function updatePinDisplay() {
+        var dots = document.getElementById("pinDots");
+        dots.textContent = "";
+        for (var i = 0; i < 6; i++) {
+          var dot = document.createElement("span");
+          dot.className = "pin-dot" + (i < pinEntry.length ? " filled" : "");
+          dots.appendChild(dot);
+        }
+      }
+      function showPin() {
+        var savedPin = localStorage.getItem(PIN_KEY);
+        pinStage = savedPin ? "unlock" : "setup";
+        pinEntry = ""; firstPin = "";
+        document.getElementById("pinTitle").textContent = pinStage === "setup" ? "ตั้งรหัสเข้าแอป" : "ใส่รหัสเพื่อเข้าแอป";
+        document.getElementById("pinIntro").textContent = pinStage === "setup" ? "ตั้งรหัส 6 หลักที่จำได้ เพื่อช่วยล็อกหน้าจอนี้" : "กรอกรหัส 6 หลักของคุณ";
+        document.getElementById("pinError").textContent = "";
+        document.getElementById("pinOverlay").hidden = false;
+        updatePinDisplay();
+      }
+      function handlePinKey(value) {
+        if (value === "ลบ") { pinEntry = pinEntry.slice(0, -1); updatePinDisplay(); return; }
+        if (value === "ล้าง") { pinEntry = ""; updatePinDisplay(); return; }
+        if (pinEntry.length >= 6) return;
+        pinEntry += value;
+        updatePinDisplay();
+        if (pinEntry.length === 6) window.setTimeout(verifyPin, 140);
+      }
+      function verifyPin() {
+        var error = document.getElementById("pinError");
+        if (pinStage === "setup") {
+          firstPin = pinEntry; pinEntry = ""; pinStage = "confirm";
+          document.getElementById("pinTitle").textContent = "ยืนยันรหัสอีกครั้ง";
+          document.getElementById("pinIntro").textContent = "กรอกรหัส 6 หลักเดิมอีกครั้ง เพื่อยืนยัน";
+          updatePinDisplay(); return;
+        }
+        if (pinStage === "confirm") {
+          if (pinEntry !== firstPin) {
+            pinEntry = ""; firstPin = ""; pinStage = "setup";
+            document.getElementById("pinTitle").textContent = "ตั้งรหัสเข้าแอป";
+            document.getElementById("pinIntro").textContent = "รหัสไม่ตรงกัน ลองตั้งใหม่อีกครั้งนะ";
+            error.textContent = ""; updatePinDisplay(); return;
+          }
+          localStorage.setItem(PIN_KEY, pinEntry);
+          document.getElementById("pinOverlay").hidden = true;
+          pinEntry = ""; return;
+        }
+        if (pinEntry === localStorage.getItem(PIN_KEY)) {
+          document.getElementById("pinOverlay").hidden = true; error.textContent = ""; pinEntry = "";
+        } else {
+          pinEntry = ""; error.textContent = "รหัสไม่ถูกต้อง ลองอีกครั้งนะ"; updatePinDisplay();
+        }
+      }
+      var keypad = document.getElementById("keypad");
+      ["1", "2", "3", "4", "5", "6", "7", "8", "9", "ล้าง", "0", "ลบ"].forEach(function (value) {
+        var key = document.createElement("button");
+        key.type = "button"; key.className = "key" + (value === "ล้าง" || value === "ลบ" ? " action" : "");
+        key.textContent = value; key.setAttribute("aria-label", value === "ลบ" ? "ลบตัวเลขล่าสุด" : value === "ล้าง" ? "ล้างรหัส" : value);
+        key.addEventListener("click", function () { handlePinKey(value); });
+        keypad.appendChild(key);
+      });
+
+      document.getElementById("addButton").addEventListener("click", function () { openExpense(null); });
+      document.getElementById("cancelExpense").addEventListener("click", closeExpense);
+      document.getElementById("expenseOverlay").addEventListener("click", function (event) { if (event.target === event.currentTarget) closeExpense(); });
+      document.getElementById("backToMonths").addEventListener("click", function () {
+        document.getElementById("monthView").hidden = true;
+        document.getElementById("monthPicker").hidden = false;
+        window.scrollTo(0, 0);
+      });
+      document.getElementById("cancelIncome").addEventListener("click", closeIncome);
+      document.getElementById("incomeOverlay").addEventListener("click", function (event) { if (event.target === event.currentTarget) closeIncome(); });
+      document.getElementById("incomeForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        var amount = Number(event.currentTarget.elements.amount.value);
+        if (!Number.isFinite(amount) || amount < 0) {
+          document.getElementById("incomeError").textContent = "ใส่จำนวนเงินที่ถูกต้องก่อนนะ";
+          return;
+        }
+        var updated = Object.assign({}, incomes);
+        updated[monthKey(selectedYear, selectedMonth)] = amount;
+        try {
+          localStorage.setItem(INCOME_KEY, JSON.stringify(updated));
+          incomes = updated;
+          closeIncome();
+          render();
+        } catch (error) {
+          console.error("Could not save monthly income.", error);
+          document.getElementById("incomeError").textContent = "บันทึกไม่สำเร็จ พื้นที่จัดเก็บในอุปกรณ์อาจเต็ม";
+        }
+      });
+      document.getElementById("itemReceiptInput").addEventListener("change", function (event) {
+        saveItemReceipt(event.currentTarget.files[0], activeReceiptId);
+        event.currentTarget.value = "";
+      });
+      document.getElementById("expenseCategory").addEventListener("change", updateLoanLenderField);
+      document.getElementById("expenseForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        var form = event.currentTarget;
+        var amount = Number(form.elements.amount.value);
+        var date = form.elements.date.value;
+        if (!Number.isFinite(amount) || amount <= 0 || !date) {
+          document.getElementById("expenseError").textContent = "เช็กจำนวนเงินกับวันที่อีกครั้งนะ";
+          return;
+        }
+        var dateParts = date.split("-").map(Number);
+        if (dateParts[0] !== selectedYear || dateParts[1] !== selectedMonth + 1) {
+          document.getElementById("expenseError").textContent = "วันที่จ่ายต้องอยู่ในเดือนที่เลือก";
+          return;
+        }
+        if (form.elements.category.value === "ค่าเงินกู้" && !form.elements.lender.value) {
+          document.getElementById("expenseError").textContent = "เลือกผู้ให้กู้ก่อนนะ";
+          return;
+        }
+        var key = monthKey(selectedYear, selectedMonth);
+        var category = form.elements.category.value;
+        var selectedLender = category === "ค่าเงินกู้" ? findLoanLenderById(form.elements.lender.value) : null;
+        var item = {
+          id: editId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)),
+          name: form.elements.name.value.trim(),
+          amount: amount,
+          category: category,
+          lenderId: selectedLender ? selectedLender.id : "",
+          lender: selectedLender ? selectedLender.name : "",
+          date: date
+        };
+        if (!item.name) { document.getElementById("expenseError").textContent = "ใส่ชื่อรายการก่อนนะ"; return; }
+        var updated = Object.assign({}, expenses);
+        var items = currentItems();
+        if (editId) {
+          updated[key] = items.map(function (existing) { return existing.id === editId ? item : existing; });
+        } else {
+          updated[key] = items.concat([item]);
+        }
+        if (saveExpenses(updated)) { closeExpense(); render(); }
+      });
+      document.getElementById("prevYear").addEventListener("click", function () { selectedYear--; render(); });
+      document.getElementById("nextYear").addEventListener("click", function () { selectedYear++; render(); });
+      document.getElementById("lockButton").addEventListener("click", showPin);
+      render();
+      showPin();
+    }());
+  </script>
+</body>
+</html>
