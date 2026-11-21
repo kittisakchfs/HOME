@@ -68,6 +68,8 @@
     .dashboard-edit { float: right; padding: 6px 9px; border: 0; border-radius: 9px; background: rgba(255,255,255,.7); font-size: 11px; font-weight: 750; cursor: pointer; }
     .dashboard-category { grid-column: span 2; display: flex; align-items: stretch; gap: 9px; padding: 0; background: transparent; box-shadow: none; }
     .category-main { display: flex; flex: 1; min-width: 0; flex-direction: column; justify-content: space-between; gap: 13px; padding: 17px; border-radius: 18px; background: white; box-shadow: var(--shadow); }
+    .dashboard-category.internet-category { align-self: start; }
+    .internet-category .category-main { justify-content: flex-start; }
     .category-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; }
     .category-total { font-size: 23px; font-weight: 850; letter-spacing: -.5px; }
     .category-actions { display: flex; flex-wrap: wrap; gap: 7px; }
@@ -84,14 +86,17 @@
     .loan-tracker-content[hidden] { display: none; }
     .loan-tracker-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; border-top: 1px solid #eceee8; }
     .loan-tracker-name { display: flex; min-width: 0; flex: 1; align-items: center; gap: 9px; font-size: 12px; font-weight: 750; }
-    .loan-tracker-name-text { min-width: 0; overflow-wrap: anywhere; }
-    .loan-tracker-badge { display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center; border-radius: 10px; background: #e8eee1; color: #405743; font-size: 9px; font-weight: 850; }
+    .loan-tracker-name-text { min-width: 0; max-width: 100%; padding: 5px 9px; border: 1.5px solid transparent; border-radius: 9px; background: linear-gradient(#fff, #fff) padding-box, linear-gradient(90deg, #f07171, #f0b65a, #e5d867, #67bd89, #69aee0, #a383d6, #ee82b0, #f07171) border-box; background-size: 100% 100%, 250% 100%; color: #293a32; overflow-wrap: anywhere; animation: rainbow-border-run 3s linear infinite; }
+    @keyframes rainbow-border-run {
+      from { background-position: 0 0, 0% 50%; }
+      to { background-position: 0 0, 100% 50%; }
+    }
     .loan-lender-edit, .loan-lender-add, .loan-lender-save, .loan-lender-cancel { padding: 6px 8px; border: 0; border-radius: 8px; background: #e8eee1; color: #405743; font-size: 10px; font-weight: 750; cursor: pointer; }
     .loan-lender-manager { padding: 10px; border-top: 1px solid #eceee8; }
     .loan-lender-add { background: #e8eee1; }
     .loan-lender-editor { display: grid; gap: 8px; margin-top: 10px; }
     .loan-lender-editor[hidden] { display: none; }
-    .loan-lender-editor-fields { display: grid; grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
+    .loan-lender-editor-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
     .loan-lender-editor input { width: 100%; min-width: 0; min-height: 36px; border: 1px solid #e1e4dc; border-radius: 9px; padding: 0 9px; background: white; font-size: 11px; }
     .loan-lender-editor-actions { display: flex; gap: 7px; }
     .loan-lender-save { background: #344b3b; color: white; }
@@ -100,8 +105,15 @@
     .loan-tracker-input-wrap { position: relative; width: 126px; flex: 0 0 auto; }
     .loan-tracker-input { width: 100%; min-height: 36px; border: 1px solid #e1e4dc; border-radius: 10px; padding: 0 29px 0 9px; background: white; text-align: right; font-size: 12px; font-weight: 750; }
     .loan-tracker-currency { position: absolute; top: 50%; right: 10px; color: #8b9086; font-size: 10px; transform: translateY(-50%); pointer-events: none; }
+    .internet-tracker { display: grid; width: 100%; gap: 8px; margin-top: 3px; }
+    .internet-tracker-row { display: grid; grid-template-columns: minmax(0, 1fr) 126px; align-items: center; gap: 8px; }
+    .internet-tracker-label { display: inline-flex; min-width: 0; min-height: 36px; align-items: center; justify-self: start; padding: 0 11px; border-radius: 10px; background: #FF746C; color: #293a32; font-size: 12px; font-weight: 750; }
     .month-view .loan-tracker { border-color: #d7d0bc; background: #f9f5e9; }
     .month-view .loan-tracker-toggle { background: #eee7d6; }
+    .month-view .loan-tracker-title,
+    .month-view .loan-tracker-total { color: #293a32; }
+    .month-view .loan-tracker-hint { color: #74776d; }
+    .month-view .loan-tracker-name-text { color: #293a32; }
     .month-view .loan-tracker-row { border-color: #e6decb; }
     .month-view .loan-tracker-input { border-color: #d9d0ba; }
     .dashboard-balance { grid-column: span 2; min-height: 130px; background: #e8def5; }
@@ -200,6 +212,7 @@
     .add-btn:hover { background: #41463d; }
     .expense-list { display: grid; gap: 10px; }
     .expense-row { display: grid; grid-template-columns: 46px 1fr auto auto; align-items: center; gap: 13px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 17px; background: white; }
+    .expense-row.tracker-expense-row { grid-template-columns: 46px 1fr auto; }
     .expense-icon { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 14px; font-size: 21px; }
     .tone-0 { background: var(--pink); } .tone-1 { background: var(--blue); } .tone-2 { background: var(--yellow); } .tone-3 { background: #e6ddf5; }
     .expense-name { font-size: 14px; font-weight: 800; }
@@ -251,14 +264,16 @@
       .dashboard-category, .dashboard-balance { grid-column: 1 / -1; }
       .category-main { padding: 14px; }
       .loan-tracker-input-wrap { width: 118px; }
+      .internet-tracker-row { grid-template-columns: minmax(0, 1fr) 118px; }
       .month-view-head { align-items: flex-start; flex-direction: column; }
       .expense-row { grid-template-columns: 42px 1fr auto; gap: 10px; padding: 12px; }
+      .expense-row.tracker-expense-row { grid-template-columns: 42px 1fr auto; }
       .expense-icon { width: 40px; height: 40px; }
       .row-actions { grid-column: 2 / -1; justify-self: end; margin-top: -3px; }
       .expense-amount { grid-column: 3; grid-row: 1; }
       .expense-main { grid-column: 2; grid-row: 1; }
     }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
   </style>
 </head>
 <body>
@@ -308,9 +323,9 @@
     <form class="dialog" id="expenseForm">
       <h2 id="expenseDialogTitle">เพิ่มรายการ</h2>
       <p class="dialog-intro">ใส่รายละเอียดไว้ จะได้เห็นภาพค่าใช้จ่ายชัดขึ้น</p>
-      <div class="form-field"><label for="expenseName">ชื่อรายการ</label><input id="expenseName" name="name" maxlength="50" placeholder="เช่น ค่าอินเทอร์เน็ต" required></div>
+      <div class="form-field" id="expenseNameField"><label for="expenseName">ชื่อรายการ</label><input id="expenseName" name="name" maxlength="50" placeholder="เช่น ค่าอินเทอร์เน็ต" required></div>
       <div class="form-field"><label for="expenseAmount">จำนวนเงิน (บาท)</label><input id="expenseAmount" name="amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" required></div>
-      <div class="form-field"><label for="expenseCategory">หมวดหมู่</label><select id="expenseCategory" name="category"><option>ค่าบ้าน กทม</option><option>ค่าบ้าน นครราชสีมา</option><option>ค่าเน็ต</option><option>ค่าเงินกู้</option></select></div>
+      <div class="form-field"><label for="expenseCategory">หมวดหมู่</label><select id="expenseCategory" name="category"><option>ค่าบ้าน กทม</option><option>ค่าบ้าน นครราชสีมา</option><option value="ค่าเน็ต">ค่าเน็ต</option><option>ค่าเงินกู้</option></select></div>
       <div class="form-field" id="loanLenderField" hidden><label for="loanLender">รายการย่อยค่าเงินกู้</label><select id="loanLender" name="lender"><option value="">เลือกผู้ให้กู้</option></select></div>
       <div class="form-field"><label for="expenseDate">วันที่จ่าย</label><input id="expenseDate" name="date" type="date" required></div>
       <p class="form-error" id="expenseError" role="status"></p>
@@ -339,6 +354,7 @@
       var ITEM_RECEIPT_KEY = "jaayjoy-item-receipts-v1";
       var LOAN_TRACKER_KEY = "jaayjoy-loan-tracker-v1";
       var LOAN_LENDERS_KEY = "jaayjoy-loan-lenders-v1";
+      var INTERNET_TRACKER_KEY = "jaayjoy-internet-tracker-v1";
       var months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
       var fullMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
       var englishMonths = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
@@ -361,6 +377,7 @@
       var incomes = loadStoredObject(INCOME_KEY);
       var itemReceipts = loadStoredObject(ITEM_RECEIPT_KEY);
       var loanAmounts = loadStoredObject(LOAN_TRACKER_KEY);
+      var internetAmounts = loadStoredObject(INTERNET_TRACKER_KEY);
       var loanAmountsNeedSave = migrateLoanAmounts();
       var expensesNeedSave = migrateExpenseLenders();
       var loanTrackerExpanded = true;
@@ -471,6 +488,16 @@
           return false;
         }
       }
+      function saveInternetAmounts() {
+        try {
+          localStorage.setItem(INTERNET_TRACKER_KEY, JSON.stringify(internetAmounts));
+          return true;
+        } catch (error) {
+          console.error("Could not save monthly internet amounts.", error);
+          window.alert("บันทึกยอดค่าเน็ตไม่สำเร็จ อาจเป็นเพราะพื้นที่จัดเก็บเต็ม");
+          return false;
+        }
+      }
       function saveLoanLenders() {
         try {
           localStorage.setItem(LOAN_LENDERS_KEY, JSON.stringify({
@@ -525,13 +552,113 @@
         var saved = loanAmounts[key];
         return saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
       }
+      function getInternetItemsForMonth(key) {
+        var saved = internetAmounts[key];
+        return [0, 1].map(function (index) {
+          var item = Array.isArray(saved) ? saved[index] : null;
+          return {
+            name: item && typeof item.name === "string" ? item.name : "",
+            amount: item && item.amount !== undefined && item.amount !== null ? String(item.amount) : ""
+          };
+        });
+      }
+      function sumInternetAmounts(items) {
+        return items.reduce(function (sum, item) {
+          var amount = Number(item.amount);
+          return sum + (Number.isFinite(amount) && amount > 0 ? amount : 0);
+        }, 0);
+      }
+      function countInternetEntries(items) {
+        return items.filter(function (item) {
+          var amount = Number(item.amount);
+          return Number.isFinite(amount) && amount > 0;
+        }).length;
+      }
       function sumLoanAmounts(amounts) {
         return loanLenders.reduce(function (sum, lender) {
           var amount = Number(amounts[lender.id]);
           return sum + (Number.isFinite(amount) && amount > 0 ? amount : 0);
         }, 0);
       }
-      function renderLoanTracker(container, key) {
+      function getLoanTrackerItemsForMonth(key) {
+        var amounts = getLoanAmountsForMonth(key);
+        return loanLenders.reduce(function (items, lender) {
+          var amount = Number(amounts[lender.id]);
+          if (Number.isFinite(amount) && amount > 0) {
+            items.push({
+              id: "loan-tracker-" + lender.id,
+              name: lender.name,
+              amount: amount,
+              category: "ค่าเงินกู้",
+              lenderId: lender.id,
+              lender: lender.name,
+              date: "",
+              source: "loan-tracker"
+            });
+          }
+          return items;
+        }, []);
+      }
+      function getInternetTrackerItemsForMonth(key) {
+        return getInternetItemsForMonth(key).reduce(function (items, item, index) {
+          var amount = Number(item.amount);
+          if (Number.isFinite(amount) && amount > 0) {
+            items.push({
+              id: "internet-tracker-" + (index + 1),
+              name: index === 0 ? "เบอร์หลัก" : "เบอร์รอง",
+              amount: amount,
+              category: "ค่าเน็ต",
+              date: "",
+              source: "internet-tracker"
+            });
+          }
+          return items;
+        }, []);
+      }
+      function renderInternetTracker(container, key, onChange) {
+        var items = getInternetItemsForMonth(key);
+        var tracker = document.createElement("section");
+        tracker.className = "internet-tracker";
+        items.forEach(function (item, index) {
+          var row = document.createElement("div");
+          row.className = "internet-tracker-row";
+          var nameLabel = document.createElement("span");
+          nameLabel.className = "internet-tracker-label";
+          nameLabel.textContent = index === 0 ? "เบอร์หลัก" : "เบอร์รอง";
+          var inputWrap = document.createElement("span");
+          inputWrap.className = "loan-tracker-input-wrap";
+          var amountInput = document.createElement("input");
+          amountInput.className = "loan-tracker-input";
+          amountInput.type = "number";
+          amountInput.id = "internetAmount-" + (index + 1);
+          amountInput.min = "0";
+          amountInput.step = "0.01";
+          amountInput.inputMode = "decimal";
+          amountInput.placeholder = "0.00";
+          amountInput.setAttribute("aria-label", "ยอดค่าเน็ต " + (index === 0 ? "เบอร์หลัก" : "เบอร์รอง"));
+          amountInput.value = item.amount;
+          var currency = document.createElement("span");
+          currency.className = "loan-tracker-currency";
+          currency.textContent = "฿";
+          function saveField(field, value) {
+            if (field === "amount" && value !== "" && (!Number.isFinite(Number(value)) || Number(value) < 0)) return;
+            var monthItems = getInternetItemsForMonth(key);
+            monthItems[index][field] = value;
+            internetAmounts[key] = monthItems;
+            if (saveInternetAmounts()) onChange(monthItems);
+          }
+          amountInput.addEventListener("input", function () {
+            saveField("amount", amountInput.value);
+          });
+          inputWrap.appendChild(amountInput);
+          inputWrap.appendChild(currency);
+          row.appendChild(nameLabel);
+          row.appendChild(inputWrap);
+          tracker.appendChild(row);
+        });
+        container.appendChild(tracker);
+      }
+      function renderLoanTracker(container, key, onChange) {
         var amounts = getLoanAmountsForMonth(key);
         var tracker = document.createElement("section");
         tracker.className = "loan-tracker";
@@ -547,7 +674,7 @@
         title.textContent = "ยอดชำระแยกตามผู้ให้กู้";
         var hint = document.createElement("span");
         hint.className = "loan-tracker-hint";
-        hint.textContent = "กรอกยอดรายเดือน แยกจากรายการรายจ่ายด้านล่าง";
+        hint.textContent = "ยอดจะรวมในรายจ่ายและแสดงในรายการทั้งหมด";
         heading.appendChild(title);
         heading.appendChild(hint);
         var total = document.createElement("strong");
@@ -575,9 +702,6 @@
           row.className = "loan-tracker-row";
           var name = document.createElement("span");
           name.className = "loan-tracker-name";
-          var badge = document.createElement("span");
-          badge.className = "loan-tracker-badge";
-          badge.textContent = lender.short;
           var lenderName = document.createElement("span");
           lenderName.className = "loan-tracker-name-text";
           lenderName.textContent = lender.name;
@@ -586,9 +710,7 @@
           editButton.type = "button";
           editButton.textContent = "แก้ไข";
           editButton.setAttribute("aria-label", "แก้ไขชื่อ " + lender.name);
-          name.appendChild(badge);
           name.appendChild(lenderName);
-          name.appendChild(editButton);
           var inputWrap = document.createElement("span");
           inputWrap.className = "loan-tracker-input-wrap";
           var input = document.createElement("input");
@@ -617,11 +739,11 @@
             total.textContent = "฿" + formatMoney(sumLoanAmounts(monthAmounts));
             if (!Object.keys(monthAmounts).length) delete loanAmounts[key];
             saveLoanAmounts();
+            onChange(monthAmounts);
           });
           editButton.addEventListener("click", function () {
             editorTitle.textContent = "แก้ไขชื่อผู้ให้กู้";
             nameInput.value = lender.name;
-            shortInput.value = lender.short;
             editingLenderId = lender.id;
             editorError.textContent = "";
             editor.hidden = false;
@@ -631,6 +753,7 @@
           inputWrap.appendChild(currency);
           row.appendChild(name);
           row.appendChild(inputWrap);
+          row.appendChild(editButton);
           content.appendChild(row);
         });
         var manager = document.createElement("div");
@@ -652,13 +775,7 @@
         nameInput.maxLength = 40;
         nameInput.placeholder = "ชื่อผู้ให้กู้";
         nameInput.setAttribute("aria-label", "ชื่อผู้ให้กู้");
-        var shortInput = document.createElement("input");
-        shortInput.type = "text";
-        shortInput.maxLength = 6;
-        shortInput.placeholder = "ชื่อย่อ";
-        shortInput.setAttribute("aria-label", "ชื่อย่อบนป้าย");
         editorFields.appendChild(nameInput);
-        editorFields.appendChild(shortInput);
         var editorError = document.createElement("p");
         editorError.className = "loan-lender-error";
         editorError.setAttribute("role", "status");
@@ -677,7 +794,6 @@
           editingLenderId = null;
           editorTitle.textContent = "เพิ่มผู้ให้กู้";
           nameInput.value = "";
-          shortInput.value = "";
           editorError.textContent = "";
           editor.hidden = false;
           nameInput.focus();
@@ -688,9 +804,8 @@
         });
         saveButton.addEventListener("click", function () {
           var name = nameInput.value.trim();
-          var short = shortInput.value.trim();
-          if (!name || !short) {
-            editorError.textContent = "กรอกชื่อเต็มและชื่อย่อก่อนบันทึก";
+          if (!name) {
+            editorError.textContent = "กรอกชื่อผู้ให้กู้ก่อนบันทึก";
             return;
           }
           var duplicate = loanLenders.some(function (lender) {
@@ -705,7 +820,7 @@
             var oldName = lender.name;
             var oldShort = lender.short;
             lender.name = name;
-            lender.short = short;
+            lender.short = name;
             if (!saveLoanLenders()) {
               lender.name = oldName;
               lender.short = oldShort;
@@ -715,7 +830,7 @@
             var newLender = {
               id: "custom_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
               name: name,
-              short: short,
+              short: name,
               isDefault: false
             };
             loanLenders.push(newLender);
@@ -743,11 +858,15 @@
         var key = monthKey(selectedYear, selectedMonth);
         var previousKey = previousMonthKey();
         var previousItems = Array.isArray(expenses[previousKey]) ? expenses[previousKey] : [];
+        var previousInternetItems = getInternetItemsForMonth(previousKey);
+        var previousLoanAmounts = getLoanAmountsForMonth(previousKey);
+        var previousTotal = previousItems.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0) + sumInternetAmounts(previousInternetItems) + sumLoanAmounts(previousLoanAmounts);
         var income = Number(incomes[key]) || 0;
         var previousIncomeExists = Object.prototype.hasOwnProperty.call(incomes, previousKey);
         var previousIncome = Number(incomes[previousKey]) || 0;
         var incomeComparison = comparisonText(income, previousIncome, previousIncomeExists);
-        var expenseComparison = comparisonText(total, previousItems.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0), Object.prototype.hasOwnProperty.call(expenses, previousKey));
+        var previousExpenseExists = Object.prototype.hasOwnProperty.call(expenses, previousKey) || Object.prototype.hasOwnProperty.call(internetAmounts, previousKey) || Object.prototype.hasOwnProperty.call(loanAmounts, previousKey);
+        var expenseComparison = comparisonText(total, previousTotal, previousExpenseExists);
         var grid = document.getElementById("dashboardGrid");
         grid.textContent = "";
         document.getElementById("monthViewTitle").textContent = "เดือน" + fullMonths[selectedMonth] + " " + selectedYear;
@@ -762,16 +881,39 @@
         incomeCard.insertBefore(incomeButton, incomeCard.firstChild);
         grid.appendChild(incomeCard);
 
-        var expenseCard = makeCard("dashboard-card dashboard-metric spent", "รายจ่าย", "฿" + formatMoney(total), items.length + " รายการในเดือนนี้");
-        grid.appendChild(expenseCard);
+        var internetItems = getInternetItemsForMonth(key);
+        var currentLoanAmounts = getLoanAmountsForMonth(key);
+        var loanTrackerItems = getLoanTrackerItemsForMonth(key);
+        var spentCard = makeCard("dashboard-card dashboard-metric spent", "รายจ่าย", "฿" + formatMoney(total), (items.length + countInternetEntries(internetItems) + loanTrackerItems.length) + " รายการในเดือนนี้");
+        grid.appendChild(spentCard);
         grid.appendChild(makeCard("dashboard-card dashboard-metric compare-income", "เงินเดือนเทียบเดือนก่อน", incomeComparison.value, incomeComparison.hint));
-        grid.appendChild(makeCard("dashboard-card dashboard-metric compare-spent", "รายจ่ายเทียบเดือนก่อน", expenseComparison.value, expenseComparison.hint));
+        var compareSpentCard = makeCard("dashboard-card dashboard-metric compare-spent", "รายจ่ายเทียบเดือนก่อน", expenseComparison.value, expenseComparison.hint);
+        grid.appendChild(compareSpentCard);
+        var balanceCard;
+        function refreshMonthlyTotals() {
+          var currentList = currentItems();
+          var currentInternetItems = getInternetItemsForMonth(key);
+          var currentLoanAmounts = getLoanAmountsForMonth(key);
+          var currentLoanItems = getLoanTrackerItemsForMonth(key);
+          var currentTotal = currentList.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0) + sumInternetAmounts(currentInternetItems) + sumLoanAmounts(currentLoanAmounts);
+          var priorList = Array.isArray(expenses[previousKey]) ? expenses[previousKey] : [];
+          var priorTotal = priorList.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0) + sumInternetAmounts(getInternetItemsForMonth(previousKey)) + sumLoanAmounts(getLoanAmountsForMonth(previousKey));
+          var hasPriorExpenses = Object.prototype.hasOwnProperty.call(expenses, previousKey) || Object.prototype.hasOwnProperty.call(internetAmounts, previousKey) || Object.prototype.hasOwnProperty.call(loanAmounts, previousKey);
+          spentCard.querySelector(".dashboard-value").textContent = "฿" + formatMoney(currentTotal);
+          spentCard.querySelector(".dashboard-hint").textContent = (currentList.length + countInternetEntries(currentInternetItems) + currentLoanItems.length) + " รายการในเดือนนี้";
+          var comparison = comparisonText(currentTotal, priorTotal, hasPriorExpenses);
+          compareSpentCard.querySelector(".dashboard-value").textContent = comparison.value;
+          compareSpentCard.querySelector(".dashboard-hint").textContent = comparison.hint;
+          balanceCard.querySelector(".dashboard-value").textContent = "฿" + formatMoney(income - currentTotal);
+        }
 
         categories.forEach(function (category) {
           var categoryItems = items.filter(function (item) { return item.category === category; });
           var categoryTotal = categoryItems.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0);
+          if (category === "ค่าเน็ต") categoryTotal += sumInternetAmounts(internetItems);
+          if (category === "ค่าเงินกู้") categoryTotal += sumLoanAmounts(currentLoanAmounts);
           var categoryCard = document.createElement("article");
-          categoryCard.className = "dashboard-card dashboard-category";
+          categoryCard.className = "dashboard-card dashboard-category" + (category === "ค่าเน็ต" ? " internet-category" : "");
           var main = document.createElement("div");
           main.className = "category-main";
           var title = document.createElement("div");
@@ -780,23 +922,38 @@
           var amount = document.createElement("strong");
           amount.className = "category-total";
           amount.textContent = "฿" + formatMoney(categoryTotal);
-          var actions = document.createElement("div");
-          actions.className = "category-actions";
-          var add = document.createElement("button");
-          add.type = "button";
-          add.textContent = "＋ เพิ่มรายการ";
-          add.addEventListener("click", function () { openExpense(null, category); });
-          actions.appendChild(add);
           main.appendChild(title);
           main.appendChild(amount);
-          main.appendChild(actions);
-          if (category === "ค่าเงินกู้") renderLoanTracker(main, key);
+          if (category === "ค่าเน็ต") {
+            renderInternetTracker(main, key, function (updatedItems) {
+              amount.textContent = "฿" + formatMoney(categoryItems.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0) + sumInternetAmounts(updatedItems));
+              refreshMonthlyTotals();
+              renderExpenseList(currentItems().concat(getInternetTrackerItemsForMonth(key), getLoanTrackerItemsForMonth(key)));
+            });
+          } else {
+            var actions = document.createElement("div");
+            actions.className = "category-actions";
+            var add = document.createElement("button");
+            add.type = "button";
+            add.textContent = "＋ เพิ่มรายการ";
+            add.addEventListener("click", function () { openExpense(null, category); });
+            actions.appendChild(add);
+            main.appendChild(actions);
+            if (category === "ค่าเงินกู้") {
+              renderLoanTracker(main, key, function (updatedAmounts) {
+                var existingLoanTotal = categoryItems.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0);
+                amount.textContent = "฿" + formatMoney(existingLoanTotal + sumLoanAmounts(updatedAmounts));
+                refreshMonthlyTotals();
+                renderExpenseList(currentItems().concat(getInternetTrackerItemsForMonth(key), getLoanTrackerItemsForMonth(key)));
+              });
+            }
+          }
 
           categoryCard.appendChild(main);
           grid.appendChild(categoryCard);
         });
 
-        var balanceCard = makeCard("dashboard-card dashboard-balance", "คงเหลือ", "฿" + formatMoney(income - total), "เงินเดือน − รายจ่าย");
+        balanceCard = makeCard("dashboard-card dashboard-balance", "คงเหลือ", "฿" + formatMoney(income - total), "เงินเดือน − รายจ่าย");
         grid.appendChild(balanceCard);
       }
       function renderMonths() {
@@ -831,8 +988,12 @@
       function render() {
         renderMonths();
         var items = currentItems();
-        var total = items.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0);
+        var key = monthKey(selectedYear, selectedMonth);
+        var total = items.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0) + sumInternetAmounts(getInternetItemsForMonth(key)) + sumLoanAmounts(getLoanAmountsForMonth(key));
         renderDashboard(items, total);
+        renderExpenseList(items.concat(getInternetTrackerItemsForMonth(key), getLoanTrackerItemsForMonth(key)));
+      }
+      function renderExpenseList(items) {
         var list = document.getElementById("expenseList");
         list.textContent = "";
         if (!items.length) {
@@ -842,9 +1003,10 @@
           list.appendChild(empty);
           return;
         }
-        items.slice().sort(function (a, b) { return b.date.localeCompare(a.date); }).forEach(function (item, index) {
+        items.slice().sort(function (a, b) { return String(b.date || "").localeCompare(String(a.date || "")); }).forEach(function (item, index) {
           var row = document.createElement("article");
-          row.className = "expense-row";
+          var isTrackerItem = item.source === "loan-tracker" || item.source === "internet-tracker";
+          row.className = "expense-row" + (isTrackerItem ? " tracker-expense-row" : "");
           var icon = document.createElement("div");
           icon.className = "expense-icon " + colors[index % colors.length];
           icon.textContent = categoryIcons[item.category] || "✦";
@@ -856,34 +1018,41 @@
           var meta = document.createElement("div");
           meta.className = "expense-meta";
           var itemLender = item.lenderId ? findLoanLenderById(item.lenderId) : null;
-          meta.textContent = [item.category || "อื่น ๆ", itemLender ? itemLender.name : item.lender, formatDate(item.date)].filter(Boolean).join(" · ");
+          meta.textContent = item.source === "loan-tracker"
+            ? "ค่าเงินกู้ · ยอดจากช่องติดตาม"
+            : item.source === "internet-tracker"
+              ? "ค่าเน็ต · ยอดจากช่องติดตาม"
+            : [item.category || "อื่น ๆ", itemLender ? itemLender.name : item.lender, formatDate(item.date)].filter(Boolean).join(" · ");
           main.appendChild(name); main.appendChild(meta);
           var amount = document.createElement("div");
           amount.className = "expense-amount";
           amount.textContent = "฿" + formatMoney(Number(item.amount));
-          var actions = document.createElement("div");
-          actions.className = "row-actions";
-          var receipt = document.createElement("button");
-          receipt.type = "button";
-          receipt.className = "receipt-item-btn" + (itemReceipts[item.id] ? " has-receipt" : "");
-          receipt.textContent = itemReceipts[item.id] ? "🧾 ดูสลิป" : "＋ สลิป";
-          receipt.setAttribute("aria-label", itemReceipts[item.id] ? "ดูสลิปของ " + item.name : "แนบสลิปให้ " + item.name);
-          receipt.addEventListener("click", function () {
-            if (itemReceipts[item.id]) {
-              window.open(itemReceipts[item.id].dataUrl, "_blank", "noopener");
-            } else {
-              activeReceiptId = item.id;
-              document.getElementById("itemReceiptInput").click();
-            }
-          });
-          var edit = document.createElement("button");
-          edit.className = "icon-btn"; edit.type = "button"; edit.setAttribute("aria-label", "แก้ไข " + item.name); edit.textContent = "✎";
-          edit.addEventListener("click", function () { openExpense(item.id); });
-          var remove = document.createElement("button");
-          remove.className = "icon-btn"; remove.type = "button"; remove.setAttribute("aria-label", "ลบ " + item.name); remove.textContent = "×";
-          remove.addEventListener("click", function () { deleteExpense(item.id); });
-          actions.appendChild(receipt); actions.appendChild(edit); actions.appendChild(remove);
-          row.appendChild(icon); row.appendChild(main); row.appendChild(amount); row.appendChild(actions);
+          row.appendChild(icon); row.appendChild(main); row.appendChild(amount);
+          if (!isTrackerItem) {
+            var actions = document.createElement("div");
+            actions.className = "row-actions";
+            var receipt = document.createElement("button");
+            receipt.type = "button";
+            receipt.className = "receipt-item-btn" + (itemReceipts[item.id] ? " has-receipt" : "");
+            receipt.textContent = itemReceipts[item.id] ? "🧾 ดูสลิป" : "＋ สลิป";
+            receipt.setAttribute("aria-label", itemReceipts[item.id] ? "ดูสลิปของ " + item.name : "แนบสลิปให้ " + item.name);
+            receipt.addEventListener("click", function () {
+              if (itemReceipts[item.id]) {
+                window.open(itemReceipts[item.id].dataUrl, "_blank", "noopener");
+              } else {
+                activeReceiptId = item.id;
+                document.getElementById("itemReceiptInput").click();
+              }
+            });
+            var edit = document.createElement("button");
+            edit.className = "icon-btn"; edit.type = "button"; edit.setAttribute("aria-label", "แก้ไข " + item.name); edit.textContent = "✎";
+            edit.addEventListener("click", function () { openExpense(item.id); });
+            var remove = document.createElement("button");
+            remove.className = "icon-btn"; remove.type = "button"; remove.setAttribute("aria-label", "ลบ " + item.name); remove.textContent = "×";
+            remove.addEventListener("click", function () { deleteExpense(item.id); });
+            actions.appendChild(receipt); actions.appendChild(edit); actions.appendChild(remove);
+            row.appendChild(actions);
+          }
           list.appendChild(row);
         });
       }
@@ -914,6 +1083,9 @@
         editId = id || null;
         var form = document.getElementById("expenseForm");
         form.reset();
+        var internetOption = form.elements.category.querySelector('option[value="ค่าเน็ต"]');
+        internetOption.hidden = !editId;
+        internetOption.disabled = !editId;
         document.getElementById("expenseDialogTitle").textContent = editId ? "แก้ไขรายการ" : "เพิ่มรายการ";
         document.getElementById("expenseError").textContent = "";
         var item = editId ? currentItems().find(function (entry) { return entry.id === editId; }) : null;
@@ -924,10 +1096,18 @@
         var itemLender = item ? (item.lenderId ? findLoanLenderById(item.lenderId) : findLoanLenderByName(item.lender)) : null;
         refreshLoanLenderOptions(itemLender ? itemLender.id : "");
         form.elements.lender.value = itemLender ? itemLender.id : "";
+        updateExpenseNameField();
         updateLoanLenderField();
         form.elements.date.value = date;
         document.getElementById("expenseOverlay").hidden = false;
-        document.getElementById("expenseName").focus();
+        (document.getElementById("expenseNameField").hidden ? form.elements.amount : form.elements.name).focus();
+      }
+      function updateExpenseNameField() {
+        var form = document.getElementById("expenseForm");
+        var category = form.elements.category.value;
+        var showName = Boolean(editId) || category === "ค่าเงินกู้" || category === "ค่าเน็ต";
+        document.getElementById("expenseNameField").hidden = !showName;
+        form.elements.name.required = showName;
       }
       function updateLoanLenderField() {
         var form = document.getElementById("expenseForm");
@@ -1082,7 +1262,10 @@
         saveItemReceipt(event.currentTarget.files[0], activeReceiptId);
         event.currentTarget.value = "";
       });
-      document.getElementById("expenseCategory").addEventListener("change", updateLoanLenderField);
+      document.getElementById("expenseCategory").addEventListener("change", function () {
+        updateExpenseNameField();
+        updateLoanLenderField();
+      });
       document.getElementById("expenseForm").addEventListener("submit", function (event) {
         event.preventDefault();
         var form = event.currentTarget;
@@ -1104,9 +1287,10 @@
         var key = monthKey(selectedYear, selectedMonth);
         var category = form.elements.category.value;
         var selectedLender = category === "ค่าเงินกู้" ? findLoanLenderById(form.elements.lender.value) : null;
+        var name = category === "ค่าเงินกู้" || category === "ค่าเน็ต" || editId ? form.elements.name.value.trim() : category;
         var item = {
           id: editId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)),
-          name: form.elements.name.value.trim(),
+          name: name,
           amount: amount,
           category: category,
           lenderId: selectedLender ? selectedLender.id : "",
