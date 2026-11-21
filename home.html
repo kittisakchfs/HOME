@@ -4,7 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f5f2">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="HOME">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>HOME — จัดการค่าใช้จ่าย</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./Home.png" type="image/png">
+  <link rel="apple-touch-icon" href="./Home.png">
   <style>
     :root {
       color-scheme: light;
@@ -1314,6 +1320,15 @@
       render();
       showPin();
     }());
+  </script>
+  <script>
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js").catch(function (error) {
+          console.error("Service worker registration failed.", error);
+        });
+      });
+    }
   </script>
 </body>
 </html>
