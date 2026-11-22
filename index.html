@@ -59,16 +59,18 @@
     .month-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
     .year-switch { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; font-weight: 700; }
     .year-switch button { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 10px; background: white; cursor: pointer; }
-    .months { display: flex; flex-direction: column; align-items: center; gap: 13px; max-height: 390px; overflow-y: auto; padding: 3px 8px 12px; margin: 0 auto 19px; scrollbar-width: thin; }
-    .month-btn { display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; justify-content: center; gap: 7px; width: min(100%, 520px); min-height: 105px; padding: 16px; border: 2px solid transparent; border-radius: 20px; color: var(--ink); cursor: pointer; transition: .18s ease; box-shadow: 0 8px 20px rgba(30, 34, 24, .04); }
-    .month-btn:nth-child(4n + 1) { background: #f7dedb; }
-    .month-btn:nth-child(4n + 2) { background: #dce8f8; }
-    .month-btn:nth-child(4n + 3) { background: #f5edbd; }
-    .month-btn:nth-child(4n) { background: #e8def5; }
-    .month-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(30, 34, 24, .08); }
-    .month-btn.active { border-color: #667d3c; box-shadow: 0 0 0 3px rgba(201,243,106,.45), 0 10px 24px rgba(30,34,24,.08); }
-    .month-thai { font-size: 16px; font-weight: 800; }
-    .month-english { color: #666b61; font-size: 11px; font-weight: 750; letter-spacing: .12em; }
+    .months { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; padding: 3px 0 12px; margin: 0 auto 19px; }
+    .month-btn { display: flex; min-width: 0; min-height: 112px; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; border: 1px solid transparent; border-radius: 20px; color: var(--ink); cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; box-shadow: 0 8px 20px rgba(30, 34, 24, .06); }
+    .month-btn:nth-child(4n + 1) { background: linear-gradient(145deg, #d9f2e7, #c3e8d9); }
+    .month-btn:nth-child(4n + 2) { background: linear-gradient(145deg, #deebff, #cbdcff); }
+    .month-btn:nth-child(4n + 3) { background: linear-gradient(145deg, #eee4ff, #dfd0fa); }
+    .month-btn:nth-child(4n) { background: linear-gradient(145deg, #ffe6dc, #ffd5c7); }
+    .month-btn:hover { transform: translateY(-3px); box-shadow: 0 13px 25px rgba(30, 34, 24, .12); }
+    .month-btn:focus-visible { outline: 3px solid #536fdb; outline-offset: 3px; }
+    .month-btn.active { border-color: #294d42; background: linear-gradient(145deg, #356c5a, #244e42); color: #fff; box-shadow: 0 0 0 3px rgba(53,108,90,.2), 0 12px 24px rgba(30,34,24,.16); }
+    .month-thai { font-size: clamp(12px, 1.8vw, 16px); font-weight: 800; line-height: 1.35; text-align: center; overflow-wrap: anywhere; }
+    .month-english { color: #59665f; font-size: 10px; font-weight: 750; letter-spacing: .08em; }
+    .month-btn.active .month-english { color: #d4eee2; }
     .month-view[hidden], #monthPicker[hidden] { display: none; }
     .month-view-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 19px; }
     .month-view-head h2 { margin: 0; font-size: clamp(22px, 4vw, 30px); letter-spacing: -.8px; }
@@ -296,10 +298,11 @@
       background: var(--card);
       color: var(--ink);
     }
-    :root[data-theme="dark"] .month-btn:nth-child(4n + 1) { background: #493937; }
-    :root[data-theme="dark"] .month-btn:nth-child(4n + 2) { background: #34414d; }
-    :root[data-theme="dark"] .month-btn:nth-child(4n + 3) { background: #49452f; }
-    :root[data-theme="dark"] .month-btn:nth-child(4n) { background: #40374d; }
+    :root[data-theme="dark"] .month-btn:nth-child(4n + 1) { background: linear-gradient(145deg, #29483d, #203b33); }
+    :root[data-theme="dark"] .month-btn:nth-child(4n + 2) { background: linear-gradient(145deg, #2d405b, #24354d); }
+    :root[data-theme="dark"] .month-btn:nth-child(4n + 3) { background: linear-gradient(145deg, #44385e, #362b4d); }
+    :root[data-theme="dark"] .month-btn:nth-child(4n) { background: linear-gradient(145deg, #5a3d3b, #49312f); }
+    :root[data-theme="dark"] .month-btn.active { border-color: #a7d8bd; background: linear-gradient(145deg, #356c5a, #244e42); }
     :root[data-theme="dark"] .month-english,
     :root[data-theme="dark"] .dashboard-label,
     :root[data-theme="dark"] .dashboard-hint,
@@ -366,6 +369,9 @@
     @media (max-width: 420px) {
       .topbar { flex-wrap: wrap; }
       .topbar-actions { width: 100%; }
+      .months { gap: 9px; }
+      .month-btn { min-height: 88px; padding: 9px 3px; border-radius: 15px; }
+      .month-english { font-size: 8px; letter-spacing: .05em; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
   </style>
@@ -1068,20 +1074,20 @@
         var tabs = document.getElementById("monthTabs");
         tabs.textContent = "";
         var monthOrder = [];
-        for (var index = selectedMonth; index >= 0; index--) monthOrder.push(index);
-        for (var futureIndex = 11; futureIndex > selectedMonth; futureIndex--) monthOrder.push(futureIndex);
+        for (var index = 0; index < 12; index++) monthOrder.push(index);
         monthOrder.forEach(function (index) {
           var button = document.createElement("button");
           button.type = "button";
           button.className = "month-btn" + (index === selectedMonth ? " active" : "");
           var thaiName = document.createElement("span");
           thaiName.className = "month-thai";
-          thaiName.textContent = "เดือน" + fullMonths[index] + " " + selectedYear;
+          thaiName.textContent = fullMonths[index];
           var englishName = document.createElement("span");
           englishName.className = "month-english";
           englishName.textContent = englishMonths[index];
           button.appendChild(thaiName);
           button.appendChild(englishName);
+          button.setAttribute("aria-label", "เดือน" + fullMonths[index] + " " + selectedYear);
           button.setAttribute("aria-pressed", index === selectedMonth ? "true" : "false");
           button.addEventListener("click", function () {
             selectedMonth = index;
