@@ -128,6 +128,8 @@
     .internet-tracker { display: grid; width: 100%; gap: 8px; margin-top: 3px; }
     .internet-tracker-row { display: grid; grid-template-columns: minmax(0, 1fr) 126px; align-items: center; gap: 8px; }
     .internet-tracker-label { display: inline-flex; min-width: 0; min-height: 36px; align-items: center; justify-self: start; padding: 0 11px; border-radius: 10px; background: #FF746C; color: #293a32; font-size: 12px; font-weight: 750; }
+    .home-loan-balance { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 11px; border-radius: 11px; background: #e8eee1; color: #405743; font-size: 11px; font-weight: 750; }
+    .home-loan-balance strong { flex: 0 0 auto; font-size: 13px; font-weight: 850; }
     .month-view .loan-tracker { border-color: #d7d0bc; background: #f9f5e9; }
     .month-view .loan-tracker-toggle { background: #eee7d6; }
     .month-view .loan-tracker-title,
@@ -321,6 +323,7 @@
     :root[data-theme="dark"] .loan-lender-cancel,
     :root[data-theme="dark"] .secondary,
     :root[data-theme="dark"] .key { background: #354139; color: var(--ink); }
+    :root[data-theme="dark"] .home-loan-balance { background: #354139; color: var(--ink); }
     :root[data-theme="dark"] .dashboard-edit:hover,
     :root[data-theme="dark"] .category-actions button:hover,
     :root[data-theme="dark"] .key:hover { background: #425047; }
@@ -468,6 +471,7 @@
       var LOAN_TRACKER_KEY = "jaayjoy-loan-tracker-v1";
       var LOAN_LENDERS_KEY = "jaayjoy-loan-lenders-v1";
       var INTERNET_TRACKER_KEY = "jaayjoy-internet-tracker-v1";
+      var HOME_LOAN_INITIAL_BALANCE = 1439500;
       var months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
       var fullMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
       var englishMonths = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
@@ -686,6 +690,16 @@
           var amount = Number(item.amount);
           return Number.isFinite(amount) && amount > 0;
         }).length;
+      }
+      function getHomeLoanBalance() {
+        var totalPaid = Object.keys(expenses).reduce(function (sum, key) {
+          var items = Array.isArray(expenses[key]) ? expenses[key] : [];
+          return sum + items.reduce(function (monthSum, item) {
+            var amount = Number(item && item.amount);
+            return monthSum + (item && item.category === "ค่าบ้าน นครราชสีมา" && Number.isFinite(amount) && amount > 0 ? amount : 0);
+          }, 0);
+        }, 0);
+        return Math.max(0, HOME_LOAN_INITIAL_BALANCE - totalPaid);
       }
       function sumLoanAmounts(amounts) {
         return loanLenders.reduce(function (sum, lender) {
@@ -1037,6 +1051,17 @@
           amount.textContent = "฿" + formatMoney(categoryTotal);
           main.appendChild(title);
           main.appendChild(amount);
+          if (category === "ค่าบ้าน นครราชสีมา") {
+            var homeLoanBalance = document.createElement("div");
+            homeLoanBalance.className = "home-loan-balance";
+            var homeLoanBalanceLabel = document.createElement("span");
+            homeLoanBalanceLabel.textContent = "เงินกู้บ้านคงเหลือ";
+            var homeLoanBalanceValue = document.createElement("strong");
+            homeLoanBalanceValue.textContent = "฿" + formatMoney(getHomeLoanBalance());
+            homeLoanBalance.appendChild(homeLoanBalanceLabel);
+            homeLoanBalance.appendChild(homeLoanBalanceValue);
+            main.appendChild(homeLoanBalance);
+          }
           if (category === "ค่าเน็ต") {
             renderInternetTracker(main, key, function (updatedItems) {
               amount.textContent = "฿" + formatMoney(categoryItems.reduce(function (sum, item) { return sum + Number(item.amount || 0); }, 0) + sumInternetAmounts(updatedItems));
